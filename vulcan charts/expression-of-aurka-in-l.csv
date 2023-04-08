@@ -1,0 +1,4 @@
+﻿"TCGA samples","Series 1 (low)","Series 1 (q1)","Series 1 (median)","Series 1 (q3)","Series 1 (high)"
+"Normal<br>(n=59)",1.365,1.917,2.346,2.805,4.43
+"TP53-Mutant<br>(n=233)",1.915,12.976,17.358,27.922,56.064
+"TP53-NonMutant<br>(n=279)",1.812,4.733,9.184,16.489,40.142
