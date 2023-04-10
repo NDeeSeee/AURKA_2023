@@ -38,8 +38,9 @@ parse_cbioportal_data <-
       select(sample_id, study_id, TP53, EGFR, KRAS, AURKA) %>%
       mutate(across(
         .cols = matches("TP53|EGFR|KRAS|AURKA"),
-        .fns = function(x)
+        .fns = function(x) {
           ifelse(x == "no alteration", "WT", "ALT")
+        }
       ))
     
     rna_seq_data <-
@@ -93,18 +94,21 @@ parse_cbioportal_data <-
       mutate(
         across(
           .cols = matches("exp|tmb|age|months|smoking_pack_years"),
-          .fns = function(x)
+          .fns = function(x) {
             as.numeric(x)
+          }
         ),
         across(
           .cols = matches("sex"),
-          .fns = function(x)
+          .fns = function(x) {
             tolower(x)
+          }
         ),
         across(
           .cols = matches("smoking_history"),
-          .fns = function(x)
+          .fns = function(x) {
             as.character(x)
+          }
         )
       )
     
@@ -186,8 +190,48 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
       str_detect(stg, "2") ~ "2",
       str_detect(stg, "3") ~ "3"
     ),
-    stg = as.numeric(stg)
-  )
+    stg = as.numeric(stg),
+    across(
+      .cols = everything(),
+      .fns = function(x)
+        ifelse(x == "NA", NA, x)
+    ),
+    smoking_status = case_when(
+      smoking_status == "No" ~ "0",
+      smoking_status == "Yes" ~ "1",
+      smoking_status == "Non-Smoker" ~ "0",
+      smoking_status == "Smoker" ~ "1"
+    ),
+    across(
+      c("AURKA", "TP53", "KRAS", "EGFR"),
+      .fns = function(x)
+        factor(x, levels = c("WT", "ALT"))
+    ),
+    across(
+      c("rad_therapy", "smoking_status", "stg", "sex", "chem_therapy"),
+      .fns = function(x)
+        as.factor(x)
+    )
+  ) %>%
+  select(
+    age,
+    sex,
+    smoking_status,
+    stg,
+    smoking_pack_years,
+    chem_therapy,
+    rad_therapy,
+    tmb,
+    TP53,
+    EGFR,
+    KRAS,
+    AURKA,
+    AURKA_rna_exp,
+    TP53_rna_exp,
+    KRAS_rna_exp,
+    EGFR_rna_exp
+  ) %>% 
+  filter(!is.na(AURKA_rna_exp))
 
 write.csv(merged_data,
           "Merged annotated data AURKA, KRAS, TP53, EGFR.csv",
@@ -275,8 +319,9 @@ alterations_data <-
   select(sample_id, study_id, TP53, EGFR, KRAS, AURKA) %>%
   mutate(across(
     .cols = matches("TP53|EGFR|KRAS|AURKA"),
-    .fns = function(x)
+    .fns = function(x) {
       ifelse(x == "no alteration", "WT", "ALT")
+    }
   ))
 
 annotated_data <- alterations_data %>%
@@ -337,8 +382,9 @@ annotated_data %>%
     KRAS_only = ifelse(KRAS == "ALT" & EGFR == "WT", "ALT", "WT"),
     across(
       !AURKA_rna_exp,
-      .fns = function(x)
+      .fns = function(x) {
         as.factor(x)
+      }
     )
   ) %>%
   pivot_longer(cols = contains("only"),
