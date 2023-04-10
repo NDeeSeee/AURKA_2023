@@ -279,7 +279,8 @@ merged_data %>%
 
 merged_data %>% 
   group_by(KRAS, TP53, EGFR) %>% 
-  summarise(AURKA_rna_exp_median = median(AURKA_rna_exp), AURKA_rna_exp_mean = mean(AURKA_rna_exp)) %>% 
+  summarise(AURKA_rna_exp_median = median(AURKA_rna_exp), AURKA_rna_exp_mean = mean(AURKA_rna_exp),
+            AURKA_rna_exp_sd = sd(AURKA_rna_exp)) %>% 
   write.csv("Basic stats AURKA mRNA expression level.csv", row.names = F)
 
 summary(lm(AURKA_rna_exp ~ ., 
