@@ -214,26 +214,27 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
       .fns = function(x) {
         as.factor(x)
       }
-    ),
-    across(
-      c(
-        "age",
-        "TP53_rna_exp",
-        "KRAS_rna_exp",
-        "EGFR_rna_exp",
-        "smoking_pack_years",
-        "tmb"
-      ),
-      .fns = function(x) {
-        factor(
-          ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
-          levels = c("lower_median", "upper_median")
-        )
-      }
-    )
-  ) %>%
+    )) %>% #,
+  #   across(
+  #     c(
+  #       "age",
+  #       "TP53_rna_exp",
+  #       "KRAS_rna_exp",
+  #       "EGFR_rna_exp",
+  #       "smoking_pack_years",
+  #       "tmb"
+  #     ),
+  #     .fns = function(x) {
+  #       factor(
+  #         ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
+  #         levels = c("lower_median", "upper_median")
+  #       )
+  #     }
+  #   )
+  # ) %>%
   select(
     age,
+    stg,
     sex,
     smoking_status,
     smoking_pack_years,
@@ -255,14 +256,34 @@ write.csv(merged_data,
           "Merged annotated data AURKA, KRAS, TP53, EGFR.csv",
           row.names = F)
 
-lm(AURKA_rna_exp ~ age + sex + smoking_status + smoking_pack_years + chem_therapy + rad_therapy + tmb + TP53 + EGFR + KRAS + AURKA + TP53_rna_exp + KRAS_rna_exp + EGFR_rna_exp, 
-   data = merged_data)
+# A lot of NA in this categories
+merged_data <- merged_data %>% 
+  select(-chem_therapy, -rad_therapy, -smoking_status, -smoking_pack_years)
 
-lm(AURKA_rna_exp ~ age + sex + smoking_status + chem_therapy + smoking_pack_years, 
-   data = merged_data)
+# Density chart
+merged_data %>%
+  pivot_longer(cols = matches("exp"),
+               names_to = "hugo_symbol",
+               values_to = "mrna_exp_zscore") %>%
+  mutate(hugo_symbol = str_remove(hugo_symbol, "_rna_exp"),
+         hugo_symbol = as.factor(hugo_symbol)) %>%
+  ggplot(aes(x = mrna_exp_zscore, fill = hugo_symbol)) +
+  geom_density(alpha = .6) +
+  xlab("mRNA expression z-scored") + 
+  # coord_cartesian(xlim = c(-3, 3)) +
+  theme_minimal()
 
-lm(AURKA_rna_exp ~ rad_therapy, 
-   data = merged_data)
+merged_data %>% 
+  ggplot(aes(x = AURKA_rna_exp, y = KRAS_rna_exp)) +
+  geom_point()
+
+merged_data %>% 
+  group_by(KRAS, TP53, EGFR) %>% 
+  summarise(AURKA_rna_exp_median = median(AURKA_rna_exp), AURKA_rna_exp_mean = mean(AURKA_rna_exp)) %>% 
+  write.csv("Basic stats AURKA mRNA expression level.csv", row.names = F)
+
+summary(lm(AURKA_rna_exp ~ ., 
+           data = merged_data))
 
 # Analysis from 04.05.2023 -----------------------------------------------------
 sample_data <-
