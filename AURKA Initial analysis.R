@@ -198,10 +198,10 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
       }
     ),
     smoking_status = case_when(
-      smoking_status == "No" ~ "0",
-      smoking_status == "Yes" ~ "1",
-      smoking_status == "Non-Smoker" ~ "0",
-      smoking_status == "Smoker" ~ "1"
+      smoking_status == "No" ~ "Non-Smoker",
+      smoking_status == "Yes" ~ "Smoker",
+      smoking_status == "Non-Smoker" ~ "Non-Smoker",
+      smoking_status == "Smoker" ~ "Smoker"
     ),
     across(
       c("AURKA", "TP53", "KRAS", "EGFR"),
@@ -255,7 +255,14 @@ write.csv(merged_data,
           "Merged annotated data AURKA, KRAS, TP53, EGFR.csv",
           row.names = F)
 
-lm(AURKA_rna_exp ~ c(sex, age), data = merged_data)
+lm(AURKA_rna_exp ~ age + sex + smoking_status + smoking_pack_years + chem_therapy + rad_therapy + tmb + TP53 + EGFR + KRAS + AURKA + TP53_rna_exp + KRAS_rna_exp + EGFR_rna_exp, 
+   data = merged_data)
+
+lm(AURKA_rna_exp ~ age + sex + smoking_status + chem_therapy + smoking_pack_years, 
+   data = merged_data)
+
+lm(AURKA_rna_exp ~ rad_therapy, 
+   data = merged_data)
 
 # Analysis from 04.05.2023 -----------------------------------------------------
 sample_data <-
