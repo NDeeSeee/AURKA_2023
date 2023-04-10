@@ -193,8 +193,9 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
     stg = as.numeric(stg),
     across(
       .cols = everything(),
-      .fns = function(x)
+      .fns = function(x) {
         ifelse(x == "NA", NA, x)
+      }
     ),
     smoking_status = case_when(
       smoking_status == "No" ~ "0",
@@ -204,20 +205,37 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
     ),
     across(
       c("AURKA", "TP53", "KRAS", "EGFR"),
-      .fns = function(x)
+      .fns = function(x) {
         factor(x, levels = c("WT", "ALT"))
+      }
     ),
     across(
       c("rad_therapy", "smoking_status", "stg", "sex", "chem_therapy"),
-      .fns = function(x)
+      .fns = function(x) {
         as.factor(x)
+      }
+    ),
+    across(
+      c(
+        "age",
+        "TP53_rna_exp",
+        "KRAS_rna_exp",
+        "EGFR_rna_exp",
+        "smoking_pack_years",
+        "tmb"
+      ),
+      .fns = function(x) {
+        factor(
+          ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
+          levels = c("lower_median", "upper_median")
+        )
+      }
     )
   ) %>%
   select(
     age,
     sex,
     smoking_status,
-    stg,
     smoking_pack_years,
     chem_therapy,
     rad_therapy,
@@ -230,12 +248,14 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
     TP53_rna_exp,
     KRAS_rna_exp,
     EGFR_rna_exp
-  ) %>% 
+  ) %>%
   filter(!is.na(AURKA_rna_exp))
 
 write.csv(merged_data,
           "Merged annotated data AURKA, KRAS, TP53, EGFR.csv",
           row.names = F)
+
+lm(AURKA_rna_exp ~ c(sex, age), data = merged_data)
 
 # Analysis from 04.05.2023 -----------------------------------------------------
 sample_data <-
