@@ -260,6 +260,92 @@ write.csv(merged_data,
 merged_data <- merged_data %>% 
   select(-chem_therapy, -rad_therapy, -smoking_status, -smoking_pack_years)
 
+
+# temp function ----------------------------------------------------------------
+cor.mtest <- function(mat, ...) {
+  mat <- as.matrix(mat)
+  n <- ncol(mat)
+  p.mat<- matrix(NA, n, n)
+  diag(p.mat) <- 0
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      tmp <- cor.test(mat[, i], mat[, j], ...)
+      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+    }
+  }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+# end --------------------------------------------------------------------------
+num_cor_data <- select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)), where(is.numeric), -AURKA_rna_exp)
+p.mat <- cor.mtest(num_cor_data)
+# Scatter plots of numeric variables
+pairs(num_cor_data)
+library(corrplot)
+corrplot(cor(num_cor_data), diag = F, p.mat = p.mat, sig.level = 0.005)
+
+cat_cor_data <- select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)), where(is.factor), -AURKA_rna_exp, -stg)
+
+f_test_odds_c <- c()
+f_test_lower_c <- c()
+f_test_upper_c <- c()
+f_test_p_value_c <- c()
+i_c <- c()
+j_c <- c()
+both_check <- c()
+for (i in names(cat_cor_data)) {
+  for (j in names(cat_cor_data)) {
+    if (i != j) {
+      both = paste0(sort(c(i, j)), collapse = "")
+      if (!both %in% both_check) {
+        both_check <- c(both_check, both)
+        f_test <- fisher.test(table(select(all_of(cat_cor_data), i, j)))
+        f_test_odds_c <- c(f_test_odds_c, f_test$estimate)
+        f_test_lower_c <- c(f_test_lower_c, f_test$conf.int[1])
+        f_test_upper_c <- c(f_test_upper_c, f_test$conf.int[2])
+        f_test_p_value_c <- c(f_test_p_value_c, f_test$p.value)
+        i_c <- c(i_c, i)
+        j_c <- c(j_c, j)
+      }
+    }
+  }
+}
+
+cat_cor_data_frame <- tibble(
+  first_cat = i_c,
+  second_cat = j_c,
+  odds_ratio = f_test_odds_c,
+  upper_conf = f_test_lower_c,
+  lower_conf = f_test_upper_c,
+  p_value = f_test_p_value_c
+) %>%
+  mutate(
+    odds_ratio = log2(odds_ratio),
+    upper_conf = log2(upper_conf),
+    lower_conf = log2(lower_conf)
+  ) %>% 
+  mutate(both_cat = paste(first_cat, second_cat, sep = "-"),
+         both_cat = as.factor(both_cat))
+
+ggplot(cat_cor_data_frame, aes(
+  x = both_cat,
+  y = odds_ratio
+)) +
+  geom_hline(yintercept = 0, col = "gray35") +
+  geom_point(size = 3, position = position_dodge(0.4)) +
+  geom_errorbar(
+    aes(ymin = lower_conf, ymax = upper_conf),
+    width = .2,
+    position = position_dodge(0.4),
+    linewidth = 1
+  ) +
+  theme_minimal() +
+  xlab("") +
+  ylab("log2 odds ratio") +
+  theme(legend.title = element_blank(), text = element_text(angle = 25)) +
+  coord_cartesian(ylim = c(-2, 2))
+
+
 # Density chart
 merged_data %>%
   pivot_longer(cols = matches("exp"),
