@@ -283,8 +283,25 @@ merged_data %>%
             AURKA_rna_exp_sd = sd(AURKA_rna_exp)) %>% 
   write.csv("Basic stats AURKA mRNA expression level.csv", row.names = F)
 
+# Plain regression model
 summary(lm(AURKA_rna_exp ~ ., 
            data = merged_data))
+test1 = filter(merged_data, sex == "male")$AURKA_rna_exp
+test2 = filter(merged_data, sex == "female")$AURKA_rna_exp
+t.test(test1, test2)
+
+# Regression model with interaction between variables
+test = summary(lm(AURKA_rna_exp ~ age * stg * sex * tmb * TP53 * EGFR * KRAS * AURKA * TP53_rna_exp * KRAS_rna_exp * EGFR_rna_exp, 
+                  data = merged_data))
+
+test_coeffs = as_tibble(test$coefficients, .name_repair = "universal") %>% 
+  mutate(intercept = attributes(test$coefficients)$dimnames[[1]]) %>% 
+  rename(p_value = Pr...t.., sd = Std..Error, estimate = Estimate, t_value = t.value)
+
+test_coeffs %>% 
+  filter(p_value < 0.01)
+
+
 
 # Analysis from 04.05.2023 -----------------------------------------------------
 sample_data <-
