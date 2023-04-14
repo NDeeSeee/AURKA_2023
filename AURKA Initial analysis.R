@@ -1,6 +1,17 @@
 # Attach requirement packages and setting WD -----------------------------------
 packages_names <-
-  c("tidyverse", "data.table", "readxl", "reshape2", "rstudioapi")
+  c(
+    "tidyverse",
+    "data.table",
+    "readxl",
+    "reshape2",
+    "rstudioapi",
+    "caTools",
+    "car",
+    "quantmod",
+    "MASS",
+    "corrplot"
+  )
 
 lapply(packages_names, require, character.only = TRUE)
 
@@ -214,7 +225,8 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
       .fns = function(x) {
         as.factor(x)
       }
-    )) %>% #,
+    )
+  ) %>% # ,
   #   across(
   #     c(
   #       "age",
@@ -226,30 +238,30 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
   #     ),
   #     .fns = function(x) {
   #       factor(
-  #         ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
-  #         levels = c("lower_median", "upper_median")
-  #       )
-  #     }
-  #   )
-  # ) %>%
-  select(
-    age,
-    stg,
-    sex,
-    smoking_status,
-    smoking_pack_years,
-    chem_therapy,
-    rad_therapy,
-    tmb,
-    TP53,
-    EGFR,
-    KRAS,
-    AURKA,
-    AURKA_rna_exp,
-    TP53_rna_exp,
-    KRAS_rna_exp,
-    EGFR_rna_exp
-  ) %>%
+#         ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
+#         levels = c("lower_median", "upper_median")
+#       )
+#     }
+#   )
+# ) %>%
+select(
+  age,
+  stg,
+  sex,
+  smoking_status,
+  smoking_pack_years,
+  chem_therapy,
+  rad_therapy,
+  tmb,
+  TP53,
+  EGFR,
+  KRAS,
+  AURKA,
+  AURKA_rna_exp,
+  TP53_rna_exp,
+  KRAS_rna_exp,
+  EGFR_rna_exp
+) %>%
   filter(!is.na(AURKA_rna_exp))
 
 write.csv(merged_data,
@@ -257,15 +269,18 @@ write.csv(merged_data,
           row.names = F)
 
 # A lot of NA in this categories
-merged_data <- merged_data %>% 
-  select(-chem_therapy, -rad_therapy, -smoking_status, -smoking_pack_years)
+merged_data <- merged_data %>%
+  select(-chem_therapy,
+         -rad_therapy,
+         -smoking_status,
+         -smoking_pack_years)
 
 
 # temp function ----------------------------------------------------------------
 cor.mtest <- function(mat, ...) {
   mat <- as.matrix(mat)
   n <- ncol(mat)
-  p.mat<- matrix(NA, n, n)
+  p.mat <- matrix(NA, n, n)
   diag(p.mat) <- 0
   for (i in 1:(n - 1)) {
     for (j in (i + 1):n) {
@@ -276,15 +291,26 @@ cor.mtest <- function(mat, ...) {
   colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
   p.mat
 }
-# end --------------------------------------------------------------------------
-num_cor_data <- select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)), where(is.numeric), -AURKA_rna_exp)
+# Correlations -----------------------------------------------------------------
+num_cor_data <-
+  select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)),
+         where(is.numeric),
+         -AURKA_rna_exp)
 p.mat <- cor.mtest(num_cor_data)
 # Scatter plots of numeric variables
 pairs(num_cor_data)
-library(corrplot)
-corrplot(cor(num_cor_data), diag = F, p.mat = p.mat, sig.level = 0.005)
+corrplot(
+  cor(num_cor_data),
+  diag = F,
+  p.mat = p.mat,
+  sig.level = 0.005
+)
 
-cat_cor_data <- select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)), where(is.factor), -AURKA_rna_exp, -stg)
+cat_cor_data <-
+  select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)),
+         where(is.factor),
+         -AURKA_rna_exp,
+         -stg)
 
 f_test_odds_c <- c()
 f_test_lower_c <- c()
@@ -296,10 +322,13 @@ both_check <- c()
 for (i in names(cat_cor_data)) {
   for (j in names(cat_cor_data)) {
     if (i != j) {
-      both = paste0(sort(c(i, j)), collapse = "")
+      both <- paste0(sort(c(i, j)), collapse = "")
       if (!both %in% both_check) {
         both_check <- c(both_check, both)
-        f_test <- fisher.test(table(select(all_of(cat_cor_data), i, j)))
+        f_test <-
+          fisher.test(table(select(all_of(
+            cat_cor_data
+          ), i, j)))
         f_test_odds_c <- c(f_test_odds_c, f_test$estimate)
         f_test_lower_c <- c(f_test_lower_c, f_test$conf.int[1])
         f_test_upper_c <- c(f_test_upper_c, f_test$conf.int[2])
@@ -323,14 +352,18 @@ cat_cor_data_frame <- tibble(
     odds_ratio = log2(odds_ratio),
     upper_conf = log2(upper_conf),
     lower_conf = log2(lower_conf)
-  ) %>% 
-  mutate(both_cat = paste(first_cat, second_cat, sep = "-"),
-         both_cat = as.factor(both_cat))
+  ) %>%
+  mutate(
+    both_cat = paste(first_cat, second_cat, sep = "-"),
+    both_cat = as.factor(both_cat)
+  )
 
-ggplot(cat_cor_data_frame, aes(
-  x = both_cat,
-  y = odds_ratio
-)) +
+cat_cor_data_frame %>%
+  mutate(signif = ifelse(sign(upper_conf * lower_conf) == 1, "Signif", "Non-signif"),
+         signif = as.factor(signif)) %>%
+  ggplot(aes(x = both_cat,
+             y = odds_ratio,
+             col = signif)) +
   geom_hline(yintercept = 0, col = "gray35") +
   geom_point(size = 3, position = position_dodge(0.4)) +
   geom_errorbar(
@@ -342,8 +375,7 @@ ggplot(cat_cor_data_frame, aes(
   theme_minimal() +
   xlab("") +
   ylab("log2 odds ratio") +
-  theme(legend.title = element_blank(), text = element_text(angle = 25)) +
-  coord_cartesian(ylim = c(-2, 2))
+  theme(legend.title = element_blank(), text = element_text(angle = 25))
 
 
 # Density chart
@@ -351,41 +383,130 @@ merged_data %>%
   pivot_longer(cols = matches("exp"),
                names_to = "hugo_symbol",
                values_to = "mrna_exp_zscore") %>%
-  mutate(hugo_symbol = str_remove(hugo_symbol, "_rna_exp"),
-         hugo_symbol = as.factor(hugo_symbol)) %>%
+  mutate(
+    hugo_symbol = str_remove(hugo_symbol, "_rna_exp"),
+    hugo_symbol = as.factor(hugo_symbol)
+  ) %>%
   ggplot(aes(x = mrna_exp_zscore, fill = hugo_symbol)) +
   geom_density(alpha = .6) +
-  xlab("mRNA expression z-scored") + 
+  xlab("mRNA expression z-scored") +
   # coord_cartesian(xlim = c(-3, 3)) +
   theme_minimal()
 
-merged_data %>% 
+merged_data %>%
   ggplot(aes(x = AURKA_rna_exp, y = KRAS_rna_exp)) +
   geom_point()
 
-merged_data %>% 
-  group_by(KRAS, TP53, EGFR) %>% 
-  summarise(AURKA_rna_exp_median = median(AURKA_rna_exp), AURKA_rna_exp_mean = mean(AURKA_rna_exp),
-            AURKA_rna_exp_sd = sd(AURKA_rna_exp)) %>% 
+merged_data %>%
+  group_by(KRAS, TP53, EGFR) %>%
+  summarise(
+    AURKA_rna_exp_median = median(AURKA_rna_exp),
+    AURKA_rna_exp_mean = mean(AURKA_rna_exp),
+    AURKA_rna_exp_sd = sd(AURKA_rna_exp)
+  ) %>%
   write.csv("Basic stats AURKA mRNA expression level.csv", row.names = F)
 
-# Plain regression model
-summary(lm(AURKA_rna_exp ~ ., 
-           data = merged_data))
-test1 = filter(merged_data, sex == "male")$AURKA_rna_exp
-test2 = filter(merged_data, sex == "female")$AURKA_rna_exp
-t.test(test1, test2)
+# Plain regression model -------------------------------------------------------
+# Mixed
+plain_model <- summary(lm(AURKA_rna_exp ~ .,
+                          data = merged_data))
 
-# Regression model with interaction between variables
-test = summary(lm(AURKA_rna_exp ~ age * stg * sex * tmb * TP53 * EGFR * KRAS * AURKA * TP53_rna_exp * KRAS_rna_exp * EGFR_rna_exp, 
-                  data = merged_data))
+# KRAS only
+plain_model_kras <- summary(lm(AURKA_rna_exp ~ .,
+                               data = select(
+                                 filter(merged_data, KRAS == "ALT", EGFR == "WT"), -KRAS, -EGFR
+                               )))
 
-test_coeffs = as_tibble(test$coefficients, .name_repair = "universal") %>% 
-  mutate(intercept = attributes(test$coefficients)$dimnames[[1]]) %>% 
-  rename(p_value = Pr...t.., sd = Std..Error, estimate = Estimate, t_value = t.value)
+# EGFR only
+plain_model_egfr <- summary(lm(AURKA_rna_exp ~ .,
+                               data = select(
+                                 filter(merged_data, KRAS == "WT", EGFR == "ALT"), -KRAS, -EGFR
+                               )))
 
-test_coeffs %>% 
+
+
+male_exp <- filter(merged_data, sex == "male")$AURKA_rna_exp
+female_exp <- filter(merged_data, sex == "female")$AURKA_rna_exp
+t.test(male_exp, female_exp)
+
+# VIF --------------------------------------------------------------------------
+vif(plain_model)
+
+
+
+# Regression model with interaction between variables --------------------------
+# Mixed
+mixed_model <-
+  summary(
+    lm(
+      AURKA_rna_exp ~ age * stg * sex * tmb * TP53 * EGFR * KRAS * AURKA * TP53_rna_exp * KRAS_rna_exp * EGFR_rna_exp,
+      data = merged_data
+    )
+  )
+
+mixed_model_coeffs <-
+  as_tibble(mixed_model$coefficients, .name_repair = "universal") %>%
+  mutate(intercept = attributes(mixed_model$coefficients)$dimnames[[1]]) %>%
+  rename(
+    p_value = Pr...t..,
+    sd = Std..Error,
+    estimate = Estimate,
+    t_value = t.value
+  )
+
+mixed_model_coeffs %>%
   filter(p_value < 0.01)
+
+# KRAS only, simplified
+mixed_model_kras <-
+  summary(
+    lm(
+      AURKA_rna_exp ~ age + stg + sex + tmb + TP53 + AURKA + TP53_rna_exp * KRAS_rna_exp + EGFR_rna_exp,
+      data = select(
+        filter(merged_data, KRAS == "ALT", EGFR == "WT", !is.na(age), !is.na(stg)),
+        -KRAS,
+        -EGFR
+      )
+    )
+  )
+
+
+mixed_model_coeffs <-
+  as_tibble(mixed_model$coefficients, .name_repair = "universal") %>%
+  mutate(intercept = attributes(mixed_model$coefficients)$dimnames[[1]]) %>%
+  rename(
+    p_value = Pr...t..,
+    sd = Std..Error,
+    estimate = Estimate,
+    t_value = t.value
+  )
+
+mixed_model_coeffs %>%
+  filter(p_value < 0.01)
+
+# EGFR only
+mixed_model_egfr <-
+  summary(
+    lm(
+      AURKA_rna_exp ~ age + stg + sex + tmb + TP53 + AURKA + TP53_rna_exp * KRAS_rna_exp + EGFR_rna_exp,
+      data = select(filter(merged_data, KRAS == "WT", EGFR == "ALT"), -KRAS, -EGFR)
+    )
+  )
+
+mixed_model_coeffs <-
+  as_tibble(mixed_model$coefficients, .name_repair = "universal") %>%
+  mutate(intercept = attributes(mixed_model$coefficients)$dimnames[[1]]) %>%
+  rename(
+    p_value = Pr...t..,
+    sd = Std..Error,
+    estimate = Estimate,
+    t_value = t.value
+  )
+
+mixed_model_coeffs %>%
+  filter(p_value < 0.01)
+
+
 
 
 
