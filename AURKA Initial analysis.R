@@ -254,7 +254,8 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
     across(contains("cna"),
            .fns = function(x) {
              as.factor(ifelse(x == "NP", NA, x))
-           })
+           }),
+    study_id = as.factor(study_id)
   ) %>% # ,
   #   across(
   #     c(
@@ -277,6 +278,7 @@ select(
   age,
   stg,
   sex,
+  study_id,
   smoking_status,
   smoking_pack_years,
   chem_therapy,
@@ -304,9 +306,10 @@ write.csv(merged_data,
 # A lot of NA in this categories
 merged_data <- merged_data %>%
   select(-chem_therapy,
-         -rad_therapy,
-         -smoking_status,
-         -smoking_pack_years)
+         -rad_therapy #,
+         # -smoking_status,
+         # -smoking_pack_years
+         )
 
 
 # temp function ----------------------------------------------------------------
