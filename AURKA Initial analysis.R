@@ -328,10 +328,10 @@ cor.mtest <- function(mat, ...) {
   p.mat
 }
 # Correlations -----------------------------------------------------------------
-num_cor_data <-
-  select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)),
-         where(is.numeric),
-         -AURKA_rna_exp)
+num_cor_data <- merged_data %>% 
+  # filter(!if_any(.cols = everything(), .fns = is.na)) %>% 
+  select(where(is.numeric), -AURKA_rna_exp)
+
 p.mat <- cor.mtest(num_cor_data)
 # Scatter plots of numeric variables
 pairs(num_cor_data)
@@ -343,10 +343,10 @@ corrplot(
 )
 
 cat_cor_data <-
-  select(filter(merged_data, !if_any(.cols = everything(), .fns = is.na)),
-         where(is.factor),
-         -AURKA_rna_exp,
-         -stg)
+  merged_data %>% 
+  # filter(!if_any(.cols = everything(), .fns = is.na)) %>% 
+  select(where(is.factor), -AURKA_rna_exp, -stg) %>% 
+  select(!matches("cna|study"))
 
 f_test_odds_c <- c()
 f_test_lower_c <- c()
