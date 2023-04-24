@@ -29,6 +29,7 @@ parse_cbioportal_data <-
            patient_data,
            alterations_data,
            rna_seq_data,
+           cna_data,
            custom_columns) {
     custom_columns <- custom_columns
     
@@ -73,6 +74,25 @@ parse_cbioportal_data <-
       ) %>%
       select(-study_id)
     
+    cna_data <-
+      fread(cna_data, na.strings = c("", "[Not Available]")) %>%
+      as_tibble() %>%
+      filter(!if_any(
+        .cols = everything(),
+        .fns = function(x) {
+          is.na(x)
+        }
+      )) %>%
+      rename(
+        sample_id = SAMPLE_ID,
+        study_id = STUDY_ID,
+        TP53_cna = TP53,
+        EGFR_cna = EGFR,
+        KRAS_cna = KRAS,
+        AURKA_cna = AURKA
+      ) %>%
+      select(-study_id)
+    
     # protein_exp_data <- fread(protein_exp_data) %>%
     #   as_tibble() %>%
     #   filter(!if_all(
@@ -101,6 +121,7 @@ parse_cbioportal_data <-
       left_join(sample_data) %>%
       left_join(alterations_data) %>%
       left_join(rna_seq_data) %>%
+      left_join(cna_data) %>%
       # left_join(protein_exp_data)
       mutate(
         across(
@@ -152,6 +173,7 @@ OncoSG_data <- parse_cbioportal_data(
   "OncoSG lung adenocarcinoma data/data_clinical_patient.txt",
   "OncoSG lung adenocarcinoma data/alterations_across_samples.tsv",
   "OncoSG lung adenocarcinoma data/mRNA expression z-scores relative to all samples (log RNA Seq V2 RSEM)-2.txt",
+  "OncoSG lung adenocarcinoma data/cna.txt",
   custom_columns
 )
 
@@ -160,6 +182,7 @@ CPTAC_data <- parse_cbioportal_data(
   "CPTAC lung adenocarcinoma data/data_clinical_patient.txt",
   "CPTAC lung adenocarcinoma data/alterations_across_samples.tsv",
   "CPTAC lung adenocarcinoma data/Z-scores of mRNA expression (RPKM, log2 transformed).txt",
+  "CPTAC lung adenocarcinoma data/cna.txt",
   custom_columns
 )
 
@@ -169,6 +192,7 @@ TCGA_data_extended <- parse_cbioportal_data(
   "TCGA pancancer lung adenocarcinoma data/data_bcr_clinical_data_patient.txt",
   "TCGA pancancer lung adenocarcinoma data/alterations_across_samples.tsv",
   "TCGA pancancer lung adenocarcinoma data/mRNA expression z-scores relative to all samples (log RNA Seq V2 RSEM).txt",
+  "TCGA pancancer lung adenocarcinoma data/cna.txt",
   custom_columns
 )
 
@@ -177,6 +201,7 @@ TCGA_data <- parse_cbioportal_data(
   "TCGA pancancer lung adenocarcinoma data/data_clinical_patient.txt",
   "TCGA pancancer lung adenocarcinoma data/alterations_across_samples.tsv",
   "TCGA pancancer lung adenocarcinoma data/mRNA expression z-scores relative to all samples (log RNA Seq V2 RSEM).txt",
+  "TCGA pancancer lung adenocarcinoma data/cna.txt",
   custom_columns
 ) %>%
   left_join(y = select(
@@ -225,7 +250,11 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
       .fns = function(x) {
         as.factor(x)
       }
-    )
+    ),
+    across(contains("cna"),
+           .fns = function(x) {
+             as.factor(ifelse(x == "NP", NA, x))
+           })
   ) %>% # ,
   #   across(
   #     c(
@@ -260,7 +289,11 @@ select(
   AURKA_rna_exp,
   TP53_rna_exp,
   KRAS_rna_exp,
-  EGFR_rna_exp
+  EGFR_rna_exp,
+  AURKA_cna,
+  TP53_cna,
+  KRAS_cna,
+  EGFR_cna
 ) %>%
   filter(!is.na(AURKA_rna_exp))
 
