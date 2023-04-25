@@ -197,20 +197,6 @@ TCGA_data_extended <- parse_cbioportal_data(
   custom_columns
 )
 
-TCGA_data <- parse_cbioportal_data(
-  "TCGA pancancer lung adenocarcinoma data/data_clinical_sample.txt",
-  "TCGA pancancer lung adenocarcinoma data/data_clinical_patient.txt",
-  "TCGA pancancer lung adenocarcinoma data/alterations_across_samples.tsv",
-  "TCGA pancancer lung adenocarcinoma data/mRNA expression z-scores relative to all samples (log RNA Seq V2 RSEM).txt",
-  "TCGA pancancer lung adenocarcinoma data/cna.txt",
-  custom_columns
-) %>%
-  left_join(y = select(
-    TCGA_data_extended,
-    sample_id,
-    smoking_history,
-    smoking_pack_years
-  ))
 
 # Add hypoxia and cna data specifically for TCGA
 hyp_score_filenames <- c("Winter_Hypoxia_Score.txt", "Ragnum_Hypoxia_Score.txt", "Buffa_Hypoxia_Score.txt")
@@ -228,10 +214,25 @@ TCGA_cna_log2_scores <- fread("TCGA pancancer lung adenocarcinoma data/Log2 copy
   mutate(name = paste(toupper(name), "CNA_log2", sep = "_")) %>% 
   pivot_wider(names_from = name, values_from = value)
 
+TCGA_data <- parse_cbioportal_data(
+  "TCGA pancancer lung adenocarcinoma data/data_clinical_sample.txt",
+  "TCGA pancancer lung adenocarcinoma data/data_clinical_patient.txt",
+  "TCGA pancancer lung adenocarcinoma data/alterations_across_samples.tsv",
+  "TCGA pancancer lung adenocarcinoma data/mRNA expression z-scores relative to all samples (log RNA Seq V2 RSEM).txt",
+  "TCGA pancancer lung adenocarcinoma data/cna.txt",
+  custom_columns
+) %>%
+  left_join(y = select(
+    TCGA_data_extended,
+    sample_id,
+    smoking_history,
+    smoking_pack_years
+  )) %>% 
+  left_join(TCGA_hypoxia_scores) %>% 
+  left_join(select(TCGA_cna_log2_scores, sample_id, AURKA_CNA_log2))
+
 merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
   bind_rows(TCGA_data) %>%
-  bind_rows(TCGA_hypoxia_scores) %>%
-  bind_rows(TCGA_cna_log2_scores) %>%
   mutate(
     stg = str_remove(stg, "STAGE "),
     stg = str_remove(stg, "[A|B]"),
