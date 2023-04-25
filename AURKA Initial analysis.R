@@ -10,7 +10,8 @@ packages_names <-
     "car",
     "quantmod",
     "MASS",
-    "corrplot"
+    "corrplot",
+    "janitor"
   )
 
 lapply(packages_names, require, character.only = TRUE)
@@ -211,9 +212,26 @@ TCGA_data <- parse_cbioportal_data(
     smoking_pack_years
   ))
 
+# Add hypoxia and cna data specifically for TCGA
+hyp_score_filenames <- c("Winter_Hypoxia_Score.txt", "Ragnum_Hypoxia_Score.txt", "Buffa_Hypoxia_Score.txt")
+rel_hyp_score_filenames <- paste("TCGA pancancer lung adenocarcinoma data", hyp_score_filenames, sep = "/")
+
+TCGA_hypoxia_scores <- lapply(rel_hyp_score_filenames, fread) %>% 
+  reduce(full_join) %>% 
+  clean_names() %>% 
+  as_tibble()
+
+TCGA_cna_log2_scores <- fread("TCGA pancancer lung adenocarcinoma data/Log2 copy-number values.txt") %>% 
+  clean_names() %>% 
+  as_tibble() %>%
+  pivot_longer(cols = !c(study_id, sample_id)) %>% 
+  mutate(name = paste(toupper(name), "CNA_log2", sep = "_")) %>% 
+  pivot_wider(names_from = name, values_from = value)
 
 merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
   bind_rows(TCGA_data) %>%
+  bind_rows(TCGA_hypoxia_scores) %>%
+  bind_rows(TCGA_cna_log2_scores) %>%
   mutate(
     stg = str_remove(stg, "STAGE "),
     stg = str_remove(stg, "[A|B]"),
@@ -251,10 +269,12 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
         as.factor(x)
       }
     ),
-    across(contains("cna"),
-           .fns = function(x) {
-             as.factor(ifelse(x == "NP", NA, x))
-           }),
+    across(
+      contains("cna"),
+      .fns = function(x) {
+        as.factor(ifelse(x == "NP", NA, x))
+      }
+    ),
     study_id = as.factor(study_id)
   ) %>% # ,
   #   across(
@@ -268,51 +288,54 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
   #     ),
   #     .fns = function(x) {
   #       factor(
-#         ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
-#         levels = c("lower_median", "upper_median")
-#       )
-#     }
-#   )
-# ) %>%
-select(
-  age,
-  stg,
-  sex,
-  study_id,
-  smoking_status,
-  smoking_pack_years,
-  chem_therapy,
-  rad_therapy,
-  tmb,
-  TP53,
-  EGFR,
-  KRAS,
-  AURKA,
-  AURKA_rna_exp,
-  TP53_rna_exp,
-  KRAS_rna_exp,
-  EGFR_rna_exp,
-  AURKA_cna,
-  TP53_cna,
-  KRAS_cna,
-  EGFR_cna
-) %>%
-  filter(!is.na(AURKA_rna_exp))
+  #         ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
+  #         levels = c("lower_median", "upper_median")
+  #       )
+  #     }
+  #   )
+  # ) %>%
+  select(
+    age,
+    stg,
+    sex,
+    study_id,
+    smoking_status,
+    smoking_pack_years,
+    smoking_history,
+    tmb,
+    TP53,
+    EGFR,
+    KRAS,
+    AURKA,
+    AURKA_rna_exp,
+    TP53_rna_exp,
+    KRAS_rna_exp,
+    EGFR_rna_exp,
+    AURKA_cna,
+    AURKA_CNA_log2,
+    winter_hypoxia_score,
+    buffa_hypoxia_score,
+    ragnum_hypoxia_score
+  ) %>%
+  filter(!is.na(AURKA_rna_exp)) %>%
+  mutate(
+    smoking_status = case_when(
+      !is.na(smoking_status) ~ smoking_status,
+      is.na(smoking_status) & smoking_pack_years > 0 ~ "Smoker",
+      is.na(smoking_status) & smoking_history == "1" ~ "Non-Smoker",
+      is.na(smoking_status) &
+        smoking_history %in% c("2", "3", "4", "5") ~ "Smoker"
+    ),
+    smoking_status = as.factor(smoking_status),
+  ) %>%
+  select(-smoking_history, -smoking_pack_years)
 
 write.csv(merged_data,
           "Merged annotated data AURKA, KRAS, TP53, EGFR.csv",
           row.names = F)
 
-# A lot of NA in this categories
-merged_data <- merged_data %>%
-  select(-chem_therapy,
-         -rad_therapy,
-         # -smoking_status,
-         -smoking_pack_years
-         )
 
-
-# temp function ----------------------------------------------------------------
+# corr function ----------------------------------------------------------------
 cor.mtest <- function(mat, ...) {
   mat <- as.matrix(mat)
   n <- ncol(mat)
@@ -328,8 +351,8 @@ cor.mtest <- function(mat, ...) {
   p.mat
 }
 # Correlations -----------------------------------------------------------------
-num_cor_data <- merged_data %>% 
-  # filter(!if_any(.cols = everything(), .fns = is.na)) %>% 
+num_cor_data <- merged_data %>%
+  # filter(!if_any(.cols = everything(), .fns = is.na)) %>%
   select(where(is.numeric), -AURKA_rna_exp)
 
 p.mat <- cor.mtest(num_cor_data)
@@ -343,9 +366,9 @@ corrplot(
 )
 
 cat_cor_data <-
-  merged_data %>% 
-  # filter(!if_any(.cols = everything(), .fns = is.na)) %>% 
-  select(where(is.factor), -AURKA_rna_exp, -stg) %>% 
+  merged_data %>%
+  # filter(!if_any(.cols = everything(), .fns = is.na)) %>%
+  select(where(is.factor), -AURKA_rna_exp, -stg) %>%
   select(!matches("cna|study"))
 
 f_test_odds_c <- c()
@@ -450,13 +473,19 @@ plain_model <- summary(lm(AURKA_rna_exp ~ .,
 # KRAS only
 plain_model_kras <- summary(lm(AURKA_rna_exp ~ .,
                                data = select(
-                                 filter(merged_data, KRAS == "ALT", EGFR == "WT"), -KRAS, -EGFR, -smoking_status
+                                 filter(merged_data, KRAS == "ALT", EGFR == "WT"),
+                                 -KRAS,
+                                 -EGFR,
+                                 -smoking_status
                                )))
 
 # EGFR only
 plain_model_egfr <- summary(lm(AURKA_rna_exp ~ .,
                                data = select(
-                                 filter(merged_data, KRAS == "WT", EGFR == "ALT"), -KRAS, -EGFR, -smoking_status
+                                 filter(merged_data, KRAS == "WT", EGFR == "ALT"),
+                                 -KRAS,
+                                 -EGFR,
+                                 -smoking_status
                                )))
 
 
