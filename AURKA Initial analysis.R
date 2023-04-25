@@ -328,6 +328,7 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
         smoking_history %in% c("2", "3", "4", "5") ~ "Smoker"
     ),
     smoking_status = as.factor(smoking_status),
+    AURKA_CNA_log2 = as.numeric(as.character(AURKA_CNA_log2)),
   ) %>%
   select(-smoking_history, -smoking_pack_years)
 
@@ -468,8 +469,34 @@ merged_data %>%
 
 # Plain regression model -------------------------------------------------------
 # Mixed
+
+merged_data <- merged_data %>% 
+  mutate(across(matches("hypoxia"), .fns = function(x) as.numeric(x)))
+
+merged_data_simplified <- merged_data %>% 
+  select(!matches("hypoxia|log2")) %>% 
+  filter(if_all(.cols = everything(), .fns = function(x) !is.na(x)))
+
+plain_model_simplified <- summary(lm(AURKA_rna_exp ~ .,
+                          data = merged_data_simplified))
+
+plain_model_tcga <- summary(lm(AURKA_rna_exp ~ .,
+                               data = select(filter(merged_data, study_id == "luad_tcga_pan_can_atlas_2018"), -study_id)))
+
+
+# TCGA SHOULD BE ANALYSED SEPARATELY
+
 plain_model <- summary(lm(AURKA_rna_exp ~ .,
-                          data = merged_data))
+                          data = filter(merged_data, if_all(.cols = everything(), .fns = function(x) !is.na(x)))))
+
+plain_model <- summary(lm(AURKA_rna_exp ~ .,
+                          data = select(merged_data, !matches("hypoxia"))))
+
+plain_model <- summary(lm(AURKA_rna_exp ~ .,
+                          data = filter(merged_data, if_any(matches("hypoxia"), .fns = function(x) is.na(x)))))
+
+plain_model <- summary(lm(AURKA_rna_exp ~ .,
+                          data = filter(merged_data, if_any(.cols = everything(), .fns = function(x) is.na(x)))))
 
 # KRAS only
 plain_model_kras <- summary(lm(AURKA_rna_exp ~ .,
