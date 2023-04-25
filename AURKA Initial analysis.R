@@ -306,9 +306,9 @@ write.csv(merged_data,
 # A lot of NA in this categories
 merged_data <- merged_data %>%
   select(-chem_therapy,
-         -rad_therapy #,
+         -rad_therapy,
          # -smoking_status,
-         # -smoking_pack_years
+         -smoking_pack_years
          )
 
 
@@ -450,13 +450,13 @@ plain_model <- summary(lm(AURKA_rna_exp ~ .,
 # KRAS only
 plain_model_kras <- summary(lm(AURKA_rna_exp ~ .,
                                data = select(
-                                 filter(merged_data, KRAS == "ALT", EGFR == "WT"), -KRAS, -EGFR
+                                 filter(merged_data, KRAS == "ALT", EGFR == "WT"), -KRAS, -EGFR, -smoking_status
                                )))
 
 # EGFR only
 plain_model_egfr <- summary(lm(AURKA_rna_exp ~ .,
                                data = select(
-                                 filter(merged_data, KRAS == "WT", EGFR == "ALT"), -KRAS, -EGFR
+                                 filter(merged_data, KRAS == "WT", EGFR == "ALT"), -KRAS, -EGFR, -smoking_status
                                )))
 
 
