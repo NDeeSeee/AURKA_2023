@@ -470,6 +470,7 @@ merged_data %>%
 # Plain regression model -------------------------------------------------------
 # Mixed
 
+# Dummy Coding Using Regression
 merged_data <- merged_data %>% 
   mutate(across(matches("hypoxia"), .fns = function(x) as.numeric(x)))
 
@@ -482,6 +483,14 @@ plain_model_simplified <- summary(lm(AURKA_rna_exp ~ .,
 
 plain_model_tcga <- summary(lm(AURKA_rna_exp ~ .,
                                data = select(filter(merged_data, study_id == "luad_tcga_pan_can_atlas_2018"), -study_id)))
+
+# Difference Coding Using Regression
+k_stage <- nlevels(merged_data$stg)
+contrast_matrix <- diag(k_stage - 1) - matrix(1, k_stage - 1, k_stage - 1, byrow = TRUE)
+
+merged_data_modified <- merged_data %>% 
+  mutate(stg_modified = contrast_matrix)
+  
 
 
 # TCGA SHOULD BE ANALYSED SEPARATELY
