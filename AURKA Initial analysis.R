@@ -199,19 +199,28 @@ TCGA_data_extended <- parse_cbioportal_data(
 
 
 # Add hypoxia and cna data specifically for TCGA
-hyp_score_filenames <- c("Winter_Hypoxia_Score.txt", "Ragnum_Hypoxia_Score.txt", "Buffa_Hypoxia_Score.txt")
-rel_hyp_score_filenames <- paste("TCGA pancancer lung adenocarcinoma data", hyp_score_filenames, sep = "/")
+hyp_score_filenames <-
+  c(
+    "Winter_Hypoxia_Score.txt",
+    "Ragnum_Hypoxia_Score.txt",
+    "Buffa_Hypoxia_Score.txt"
+  )
+rel_hyp_score_filenames <-
+  paste("TCGA pancancer lung adenocarcinoma data",
+        hyp_score_filenames,
+        sep = "/")
 
-TCGA_hypoxia_scores <- lapply(rel_hyp_score_filenames, fread) %>% 
-  reduce(full_join) %>% 
-  clean_names() %>% 
+TCGA_hypoxia_scores <- lapply(rel_hyp_score_filenames, fread) %>%
+  reduce(full_join) %>%
+  clean_names() %>%
   as_tibble()
 
-TCGA_cna_log2_scores <- fread("TCGA pancancer lung adenocarcinoma data/Log2 copy-number values.txt") %>% 
-  clean_names() %>% 
+TCGA_cna_log2_scores <-
+  fread("TCGA pancancer lung adenocarcinoma data/Log2 copy-number values.txt") %>%
+  clean_names() %>%
   as_tibble() %>%
-  pivot_longer(cols = !c(study_id, sample_id)) %>% 
-  mutate(name = paste(toupper(name), "CNA_log2", sep = "_")) %>% 
+  pivot_longer(cols = !c(study_id, sample_id)) %>%
+  mutate(name = paste(toupper(name), "CNA_log2", sep = "_")) %>%
   pivot_wider(names_from = name, values_from = value)
 
 TCGA_data <- parse_cbioportal_data(
@@ -227,8 +236,8 @@ TCGA_data <- parse_cbioportal_data(
     sample_id,
     smoking_history,
     smoking_pack_years
-  )) %>% 
-  left_join(TCGA_hypoxia_scores) %>% 
+  )) %>%
+  left_join(TCGA_hypoxia_scores) %>%
   left_join(select(TCGA_cna_log2_scores, sample_id, AURKA_CNA_log2))
 
 merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
@@ -289,35 +298,35 @@ merged_data <- bind_rows(OncoSG_data, CPTAC_data) %>%
   #     ),
   #     .fns = function(x) {
   #       factor(
-  #         ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
-  #         levels = c("lower_median", "upper_median")
-  #       )
-  #     }
-  #   )
-  # ) %>%
-  select(
-    age,
-    stg,
-    sex,
-    study_id,
-    smoking_status,
-    smoking_pack_years,
-    smoking_history,
-    tmb,
-    TP53,
-    EGFR,
-    KRAS,
-    AURKA,
-    AURKA_rna_exp,
-    TP53_rna_exp,
-    KRAS_rna_exp,
-    EGFR_rna_exp,
-    AURKA_cna,
-    AURKA_CNA_log2,
-    winter_hypoxia_score,
-    buffa_hypoxia_score,
-    ragnum_hypoxia_score
-  ) %>%
+#         ifelse(x > median(x, na.rm = T), "upper_median", "lower_median"),
+#         levels = c("lower_median", "upper_median")
+#       )
+#     }
+#   )
+# ) %>%
+select(
+  age,
+  stg,
+  sex,
+  study_id,
+  smoking_status,
+  smoking_pack_years,
+  smoking_history,
+  tmb,
+  TP53,
+  EGFR,
+  KRAS,
+  AURKA,
+  AURKA_rna_exp,
+  TP53_rna_exp,
+  KRAS_rna_exp,
+  EGFR_rna_exp,
+  AURKA_cna,
+  AURKA_CNA_log2,
+  winter_hypoxia_score,
+  buffa_hypoxia_score,
+  ragnum_hypoxia_score
+) %>%
   filter(!is.na(AURKA_rna_exp)) %>%
   mutate(
     smoking_status = case_when(
@@ -471,41 +480,72 @@ merged_data %>%
 # Mixed
 
 # Dummy Coding Using Regression
-merged_data <- merged_data %>% 
-  mutate(across(matches("hypoxia"), .fns = function(x) as.numeric(x)))
+merged_data <- merged_data %>%
+  mutate(across(
+    matches("hypoxia"),
+    .fns = function(x)
+      as.numeric(x)
+  ))
 
-merged_data_simplified <- merged_data %>% 
-  select(!matches("hypoxia|log2")) %>% 
-  filter(if_all(.cols = everything(), .fns = function(x) !is.na(x)))
+merged_data_simplified <- merged_data %>%
+  select(!matches("hypoxia|log2")) %>%
+  filter(if_all(
+    .cols = everything(),
+    .fns = function(x)
+      !is.na(x)
+  ))
 
 plain_model_simplified <- summary(lm(AURKA_rna_exp ~ .,
-                          data = merged_data_simplified))
+                                     data = merged_data_simplified))
 
 plain_model_tcga <- summary(lm(AURKA_rna_exp ~ .,
-                               data = select(filter(merged_data, study_id == "luad_tcga_pan_can_atlas_2018"), -study_id)))
+                               data = select(
+                                 filter(merged_data, study_id == "luad_tcga_pan_can_atlas_2018"),
+                                 -study_id
+                               )))
 
 # Difference Coding Using Regression
 k_stage <- nlevels(merged_data$stg)
-contrast_matrix <- diag(k_stage - 1) - matrix(1, k_stage - 1, k_stage - 1, byrow = TRUE)
+contrast_matrix <-
+  diag(k_stage - 1) - matrix(1, k_stage - 1, k_stage - 1, byrow = TRUE)
 
-merged_data_modified <- merged_data %>% 
+merged_data_modified <- merged_data %>%
   mutate(stg_modified = contrast_matrix)
-  
+
 
 
 # TCGA SHOULD BE ANALYSED SEPARATELY
 
 plain_model <- summary(lm(AURKA_rna_exp ~ .,
-                          data = filter(merged_data, if_all(.cols = everything(), .fns = function(x) !is.na(x)))))
+                          data = filter(
+                            merged_data,
+                            if_all(
+                              .cols = everything(),
+                              .fns = function(x)
+                                ! is.na(x)
+                            )
+                          )))
 
 plain_model <- summary(lm(AURKA_rna_exp ~ .,
                           data = select(merged_data, !matches("hypoxia"))))
 
 plain_model <- summary(lm(AURKA_rna_exp ~ .,
-                          data = filter(merged_data, if_any(matches("hypoxia"), .fns = function(x) is.na(x)))))
+                          data = filter(
+                            merged_data, if_any(
+                              matches("hypoxia"),
+                              .fns = function(x)
+                                is.na(x)
+                            )
+                          )))
 
 plain_model <- summary(lm(AURKA_rna_exp ~ .,
-                          data = filter(merged_data, if_any(.cols = everything(), .fns = function(x) is.na(x)))))
+                          data = filter(
+                            merged_data, if_any(
+                              .cols = everything(),
+                              .fns = function(x)
+                                is.na(x)
+                            )
+                          )))
 
 # KRAS only
 plain_model_kras <- summary(lm(AURKA_rna_exp ~ .,
