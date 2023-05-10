@@ -269,60 +269,21 @@ survfit(
   data = filter(processed_rna_os_data, gene == "EGFR")
 )
 
-egfr_data <- filter(processed_rna_os_data, gene == "EGFR") %>%
-  select(-gene)
-kras_data <- filter(processed_rna_os_data, gene == "KRAS") %>%
-  select(-gene)
 
-cox_model_egfr <-
-  coxph(Surv(time = os_months, os_status) ~ AURKA_rna_exp, data = egfr_data)
-cox_model_kras <-
-  coxph(Surv(time = os_months, os_status) ~ AURKA_rna_exp, data = kras_data)
-
-visualise_cox_model <- function(cox_model_data) {
-  # Assuming cox_model is your fitted model
-  # Use broom to tidy the results
-  tidy_cox <- tidy(cox_model_data, conf.int = T)
-  
-  # Create data frame for forest plot
-  fp_data <- tidy_cox %>%
-    select(term, estimate, conf.low, conf.high) %>%
-    mutate(term = as.character(term)) %>%
-    rename(
-      `Variables` = term,
-      `Hazard Ratio` = estimate,
-      `Lower CI` = conf.low,
-      `Upper CI` = conf.high
-    ) %>%
-    as.data.frame() %>%
-    clean_names()
-  
-  return(fp_data)
+get_cox_statistics <- function(input_data) {
+  coxph(Surv(time = os_months, os_status) ~ AURKA_rna_exp, data = input_data) %>% 
+    tidy(conf.int = T) %>% 
+    return()
 }
 
-cox_model_egfr <- visualise_cox_model(cox_model_egfr)
-cox_model_kras <- visualise_cox_model(cox_model_kras)
-
-cox_model_egfr %>%
-  mutate(variables = "EGFR") %>%
-  bind_rows(mutate(cox_model_kras, variables = "KRAS")) %>%
-  as_tibble() %>%
-  mutate(variables = as.factor(variables)) %>%
-  ggplot(aes(x = variables, y = hazard_ratio, col = variables)) +
-  geom_hline(yintercept = 0) +
-  geom_point(position = position_dodge(0.05),
-             size = 2.5,
-             show.legend = F) +
-  theme(axis.text.x = element_text(angle = 90)) +
-  geom_errorbar(
-    aes(ymin = lower_ci, ymax = upper_ci),
-    width = .2,
-    position = position_dodge(0.05),
-    size = 1,
-    show.legend = F
-  ) +
-  coord_cartesian(ylim = c(-3, 4.5)) +
-  theme_classic()
+filter(processed_rna_os_data, gene == "EGFR", TP53 == "ALT") %>% 
+  get_cox_statistics()
+filter(processed_rna_os_data, gene == "EGFR", TP53 == "WT") %>% 
+  get_cox_statistics()
+filter(processed_rna_os_data, gene == "KRAS", TP53 == "ALT") %>% 
+  get_cox_statistics()
+filter(processed_rna_os_data, gene == "KRAS", TP53 == "WT") %>% 
+  get_cox_statistics()
 
 
 # surv_data_EGFR <-
