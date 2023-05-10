@@ -191,4 +191,7 @@ ks.test(EGFR_only_TP53_wt_AURKA_rna_exp, KRAS_only_TP53_wt_AURKA_rna_exp)
 ks.test(KRAS_only_TP53_mut_AURKA_rna_exp, KRAS_only_TP53_wt_AURKA_rna_exp)
 ks.test(EGFR_only_TP53_mut_AURKA_rna_exp, KRAS_only_TP53_mut_AURKA_rna_exp)
 
-t.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
+t.test(EGFR_only_TP53_mut_AURKA_rna_exp, EGFR_only_TP53_wt_AURKA_rna_exp)
+t.test(EGFR_only_TP53_wt_AURKA_rna_exp, KRAS_only_TP53_wt_AURKA_rna_exp)
+t.test(KRAS_only_TP53_mut_AURKA_rna_exp, KRAS_only_TP53_wt_AURKA_rna_exp)
+t.test(EGFR_only_TP53_mut_AURKA_rna_exp, KRAS_only_TP53_mut_AURKA_rna_exp)
