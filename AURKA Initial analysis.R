@@ -348,17 +348,6 @@ write.csv(merged_data,
 merged_data <- fread("Merged annotated data AURKA, KRAS, TP53, EGFR.csv") %>% 
   as_tibble()
 
-merged_data %>% 
-  filter(EGFR != KRAS) %>% 
-  select(AURKA_rna_exp, EGFR, KRAS) %>% 
-  pivot_longer(cols = c("EGFR", "KRAS"), names_to = "gene", values_to = "impact") %>% 
-  filter(impact != "WT") %>% 
-  select(-impact) %>% 
-  mutate(gene = as.factor(gene)) %>%
-  ggplot(aes(y = AURKA_rna_exp, x = gene, fill = gene)) +
-  geom_violin(show.legend = F) +
-  geom_boxplot(width = .2, show.legend = F) +
-  theme_classic()
 
 
 # corr function ----------------------------------------------------------------
