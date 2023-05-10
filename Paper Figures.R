@@ -1,5 +1,32 @@
-# AURKA paper figures
+# Attach requirement packages and setting WD -----------------------------------
+packages_names <-
+  c(
+    "tidyverse",
+    "data.table",
+    "readxl",
+    "reshape2",
+    "rstudioapi",
+    "caTools",
+    "car",
+    "quantmod",
+    "MASS",
+    "corrplot",
+    "janitor",
+    "nortest"
+  )
 
+lapply(packages_names, require, character.only = TRUE)
+
+setwd(dirname(getActiveDocumentContext()$path))
+
+rename <- dplyr::rename
+select <- dplyr::select
+filter <- dplyr::filter
+group_by <- dplyr::group_by
+mutate <- dplyr::mutate
+
+
+# Reading data
 merged_data <- fread("Merged annotated data AURKA, KRAS, TP53, EGFR.csv") %>% 
   as_tibble()
 
@@ -16,14 +43,13 @@ merged_data %>%
   geom_boxplot(width = .2, show.legend = F) +
   theme_classic()
 
-ggsave("Fig XA.png", dpi = 400, height = 5, width = 5, units = "in")
+ggsave("Paper Figures/Fig XA.png", dpi = 400, height = 5, width = 5, units = "in")
 
 # Statistics
 EGFR_only_AURKA_rna_exp = filter(test, gene == "EGFR")$AURKA_rna_exp
 KRAS_only_AURKA_rna_exp = filter(test, gene == "KRAS")$AURKA_rna_exp
 
 # Check for normality
-install.packages("nortest")
 nortest::ad.test(EGFR_only_AURKA_rna_exp)
 nortest::ad.test(KRAS_only_AURKA_rna_exp)
 
