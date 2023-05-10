@@ -345,6 +345,9 @@ write.csv(merged_data,
           "Merged annotated data AURKA, KRAS, TP53, EGFR.csv",
           row.names = F)
 
+merged_data <- fread("Merged annotated data AURKA, KRAS, TP53, EGFR.csv") %>% 
+  as_tibble()
+
 
 # corr function ----------------------------------------------------------------
 cor.mtest <- function(mat, ...) {
