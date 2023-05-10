@@ -325,7 +325,9 @@ select(
   AURKA_CNA_log2,
   winter_hypoxia_score,
   buffa_hypoxia_score,
-  ragnum_hypoxia_score
+  ragnum_hypoxia_score,
+  os_status,
+  os_months
 ) %>%
   filter(!is.na(AURKA_rna_exp)) %>%
   mutate(
