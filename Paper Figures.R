@@ -550,7 +550,7 @@ ggsave(
   "Paper Figures/Fig XB alternative.png",
   dpi = 400,
   height = 5,
-  width = 5,
+  width = 10,
   units = "in"
 )
 
