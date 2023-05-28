@@ -542,10 +542,14 @@ processed_cna_data_discrete %>%
   theme_minimal() +
   xlab("Genomic Variation") +
   ylab("Relative Frequency") +
-  geom_text(position = position_stack(vjust = 0.5), size = 3.5) +
+  geom_text(position = position_stack(vjust = 0.5), size = 4) +
   coord_flip() +
   scale_fill_brewer(palette = "Pastel1") +
-  theme(legend.position = "top", legend.title = element_blank()) +
+  theme(legend.position = "top", 
+        legend.title = element_blank(),
+        axis.text = element_text(size = 12, colour = "black"),
+        axis.title = element_text(size = 12, colour = "black"),
+        legend.text = element_text(size = 12, colour = "black")) +
   guides(fill = guide_legend(reverse = TRUE))
 
 ggsave(
