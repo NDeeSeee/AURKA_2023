@@ -271,18 +271,18 @@ survfit(
 
 
 get_cox_statistics <- function(input_data) {
-  coxph(Surv(time = os_months, os_status) ~ AURKA_rna_exp, data = input_data) %>% 
-    tidy(conf.int = T) %>% 
+  coxph(Surv(time = os_months, os_status) ~ AURKA_rna_exp, data = input_data) %>%
+    tidy(conf.int = T) %>%
     return()
 }
 
-filter(processed_rna_os_data, gene == "EGFR", TP53 == "ALT") %>% 
+filter(processed_rna_os_data, gene == "EGFR", TP53 == "ALT") %>%
   get_cox_statistics()
-filter(processed_rna_os_data, gene == "EGFR", TP53 == "WT") %>% 
+filter(processed_rna_os_data, gene == "EGFR", TP53 == "WT") %>%
   get_cox_statistics()
-filter(processed_rna_os_data, gene == "KRAS", TP53 == "ALT") %>% 
+filter(processed_rna_os_data, gene == "KRAS", TP53 == "ALT") %>%
   get_cox_statistics()
-filter(processed_rna_os_data, gene == "KRAS", TP53 == "WT") %>% 
+filter(processed_rna_os_data, gene == "KRAS", TP53 == "WT") %>%
   get_cox_statistics()
 
 
@@ -440,9 +440,9 @@ ad.test(EGFR_only_EGFR_protein_exp)
 ad.test(KRAS_only_EGFR_protein_exp)
 
 # Compute variance for t.test
-var(EGFR_only_EGFR_protein_exp)
+var(EGFR_only_EGFR_protein_exp, na.rm = T)
 # 0.9
-var(KRAS_only_EGFR_protein_exp)
+var(KRAS_only_EGFR_protein_exp, na.rm = T)
 # 1
 
 ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)

@@ -100,17 +100,21 @@ parse_cbioportal_data <-
         as_tibble() %>%
         filter(!if_all(
           .cols = c("TP53", "EGFR", "KRAS", "AURKA"),
-          .fns = function(x)
+          .fns = function(x) {
             is.na(x)
-        ))  %>%
-        rename(sample_id = SAMPLE_ID, study_id = STUDY_ID,
-               TP53_protein_exp = TP53,
-               EGFR_protein_exp = EGFR,
-               KRAS_protein_exp = KRAS,
-               AURKA_protein_exp = AURKA) %>%
+          }
+        )) %>%
+        rename(
+          sample_id = SAMPLE_ID,
+          study_id = STUDY_ID,
+          TP53_protein_exp = TP53,
+          EGFR_protein_exp = EGFR,
+          KRAS_protein_exp = KRAS,
+          AURKA_protein_exp = AURKA
+        ) %>%
         select(-study_id)
     } else {
-      protein_exp_data <- alterations_data %>% 
+      protein_exp_data <- alterations_data %>%
         select(sample_id)
     }
     
@@ -129,7 +133,7 @@ parse_cbioportal_data <-
       left_join(alterations_data) %>%
       left_join(rna_seq_data) %>%
       left_join(cna_data) %>%
-      left_join(protein_exp_data) %>% 
+      left_join(protein_exp_data) %>%
       mutate(
         across(
           .cols = matches("exp|tmb|age|months|smoking_pack_years"),
@@ -360,7 +364,8 @@ write.csv(merged_data,
           "Merged annotated data AURKA, KRAS, TP53, EGFR.csv",
           row.names = F)
 
-merged_data <- fread("Merged annotated data AURKA, KRAS, TP53, EGFR.csv") %>% 
+merged_data <-
+  fread("Merged annotated data AURKA, KRAS, TP53, EGFR.csv") %>%
   as_tibble()
 
 
@@ -502,16 +507,18 @@ merged_data %>%
 merged_data <- merged_data %>%
   mutate(across(
     matches("hypoxia"),
-    .fns = function(x)
+    .fns = function(x) {
       as.numeric(x)
+    }
   ))
 
 merged_data_simplified <- merged_data %>%
   select(!matches("hypoxia|log2")) %>%
   filter(if_all(
     .cols = everything(),
-    .fns = function(x)
+    .fns = function(x) {
       !is.na(x)
+    }
   ))
 
 plain_model_simplified <- summary(lm(AURKA_rna_exp ~ .,
@@ -540,8 +547,9 @@ plain_model <- summary(lm(AURKA_rna_exp ~ .,
                             merged_data,
                             if_all(
                               .cols = everything(),
-                              .fns = function(x)
-                                ! is.na(x)
+                              .fns = function(x) {
+                                !is.na(x)
+                              }
                             )
                           )))
 
@@ -552,8 +560,9 @@ plain_model <- summary(lm(AURKA_rna_exp ~ .,
                           data = filter(
                             merged_data, if_any(
                               matches("hypoxia"),
-                              .fns = function(x)
+                              .fns = function(x) {
                                 is.na(x)
+                              }
                             )
                           )))
 
@@ -561,8 +570,9 @@ plain_model <- summary(lm(AURKA_rna_exp ~ .,
                           data = filter(
                             merged_data, if_any(
                               .cols = everything(),
-                              .fns = function(x)
+                              .fns = function(x) {
                                 is.na(x)
+                              }
                             )
                           )))
 
