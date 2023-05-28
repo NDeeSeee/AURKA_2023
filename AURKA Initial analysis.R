@@ -237,7 +237,8 @@ TCGA_data <- parse_cbioportal_data(
   "TCGA pancancer lung adenocarcinoma data/alterations_across_samples.tsv",
   "TCGA pancancer lung adenocarcinoma data/mRNA expression z-scores relative to all samples (log RNA Seq V2 RSEM).txt",
   "TCGA pancancer lung adenocarcinoma data/cna.txt",
-  custom_columns
+  custom_columns,
+  "TCGA pancancer lung adenocarcinoma data/Protein expression z-scores (RPPA).txt"
 ) %>%
   left_join(y = select(
     TCGA_data_extended,

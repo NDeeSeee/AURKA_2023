@@ -394,3 +394,56 @@ var(KRAS_only_EGFR_rna_exp)
 
 ks.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 t.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
+
+# Figure XA EGFR protein level -------------------------------------------------
+processed_protein_data <- merged_data %>%
+  filter(EGFR != KRAS) %>%
+  select(EGFR_protein_exp, EGFR, KRAS) %>%
+  pivot_longer(
+    cols = c("EGFR", "KRAS"),
+    names_to = "gene",
+    values_to = "impact"
+  ) %>%
+  filter(impact != "WT") %>%
+  select(-impact) %>%
+  mutate(gene = as.factor(gene))
+
+processed_protein_data %>%
+  ggviolin(
+    y = "EGFR_protein_exp",
+    x = "gene",
+    fill = "gene",
+    add = "boxplot",
+    add.params = list(fill = "white")
+  ) +
+  theme(legend.position = "none") +
+  stat_compare_means(method = "wilcox.test",
+                     label.y = 4.5,
+                     label.x = 1.3)
+
+ggsave(
+  "Paper Figures/Fig XA EGFR protein level.png",
+  dpi = 400,
+  height = 5,
+  width = 5,
+  units = "in"
+)
+
+# Statistics
+EGFR_only_EGFR_protein_exp <-
+  filter(processed_protein_data, gene == "EGFR")$EGFR_protein_exp
+KRAS_only_EGFR_protein_exp <-
+  filter(processed_protein_data, gene == "KRAS")$EGFR_protein_exp
+
+# Check for normality
+ad.test(EGFR_only_EGFR_protein_exp)
+ad.test(KRAS_only_EGFR_protein_exp)
+
+# Compute variance for t.test
+var(EGFR_only_EGFR_protein_exp)
+# 0.9
+var(KRAS_only_EGFR_protein_exp)
+# 1
+
+ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
+t.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
