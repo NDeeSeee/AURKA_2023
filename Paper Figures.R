@@ -547,9 +547,9 @@ processed_cna_data_discrete %>%
   scale_fill_brewer(palette = "Pastel1") +
   theme(legend.position = "top", 
         legend.title = element_blank(),
-        axis.text = element_text(size = 12, colour = "black"),
-        axis.title = element_text(size = 12, colour = "black"),
-        legend.text = element_text(size = 12, colour = "black")) +
+        axis.text = element_text(size = 15, colour = "black"),
+        axis.title = element_text(size = 15, colour = "black"),
+        legend.text = element_text(size = 15, colour = "black")) +
   guides(fill = guide_legend(reverse = TRUE))
 
 ggsave(
