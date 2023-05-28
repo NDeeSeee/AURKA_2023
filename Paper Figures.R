@@ -447,3 +447,121 @@ var(KRAS_only_EGFR_protein_exp, na.rm = T)
 
 ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
 t.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
+
+processed_cna_data <- merged_data %>%
+  filter(EGFR != KRAS, !is.na(AURKA_CNA_log2)) %>%
+  select(AURKA_CNA_log2, EGFR, KRAS) %>%
+  pivot_longer(
+    cols = c("EGFR", "KRAS"),
+    names_to = "gene",
+    values_to = "impact"
+  ) %>%
+  filter(impact != "WT") %>%
+  select(-impact) %>%
+  mutate(gene = as.factor(gene))
+
+processed_cna_data %>%
+  ggviolin(
+    y = "AURKA_CNA_log2",
+    x = "gene",
+    fill = "gene",
+    add = "boxplot",
+    add.params = list(fill = "white")
+  ) +
+  theme(legend.position = "none") +
+  stat_compare_means(method = "wilcox.test",
+                     label.y = 4.5,
+                     label.x = 1.3)
+
+ggsave(
+  "Paper Figures/Fig XB.png",
+  dpi = 400,
+  height = 5,
+  width = 5,
+  units = "in"
+)
+
+# Statistics
+EGFR_only_AURKA_CNA_log2 <-
+  filter(processed_cna_data, gene == "EGFR")$AURKA_CNA_log2
+KRAS_only_AURKA_CNA_log2 <-
+  filter(processed_cna_data, gene == "KRAS")$AURKA_CNA_log2
+
+# Check for normality
+ad.test(EGFR_only_AURKA_CNA_log2)
+ad.test(KRAS_only_AURKA_CNA_log2)
+
+# Compute variance for t.test
+var(EGFR_only_AURKA_CNA_log2)
+# 0.276
+var(KRAS_only_AURKA_CNA_log2)
+# 0.164
+
+ks.test(EGFR_only_AURKA_CNA_log2, KRAS_only_AURKA_CNA_log2)
+t.test(EGFR_only_AURKA_CNA_log2, KRAS_only_AURKA_CNA_log2)
+# Figure XB alternative --------------------------------------------------------
+processed_cna_data_discrete <- merged_data %>%
+  filter(EGFR != KRAS, !is.na(AURKA_cna)) %>%
+  select(AURKA_cna, EGFR, KRAS) %>%
+  pivot_longer(
+    cols = c("EGFR", "KRAS"),
+    names_to = "gene",
+    values_to = "impact"
+  ) %>%
+  filter(impact != "WT") %>%
+  select(-impact) %>%
+  mutate(gene = as.factor(gene)) %>%
+  group_by(AURKA_cna, gene) %>%
+  summarise(count = n()) %>%
+  mutate(
+    AURKA = fct_recode(
+      AURKA_cna,
+      "Shallow Deletion" = "-1",
+      "Diploid" = "0",
+      "Gain" = "1",
+      "Amplification" = "2"
+    )
+  ) %>%
+  ungroup() %>%
+  group_by(gene) %>%
+  reframe(proportion = count / sum(count),
+          AURKA = AURKA,
+          count = count)
+
+processed_cna_data_discrete %>%
+  mutate() %>%
+  ggplot(aes(
+    x = gene,
+    y = proportion,
+    fill = AURKA,
+    label = count
+  )) +
+  geom_col(position = "fill",
+           width = .5,
+           colour = "black") +
+  theme_minimal() +
+  xlab("Genomic Variation") +
+  ylab("Relative Frequency") +
+  geom_text(position = position_stack(vjust = 0.5), size = 3.5) +
+  coord_flip() +
+  scale_fill_brewer(palette = "Pastel1")
+
+ggsave(
+  "Paper Figures/Fig XB alternative.png",
+  dpi = 400,
+  height = 5,
+  width = 5,
+  units = "in"
+)
+
+# Statistics
+EGFR_only_AURKA_CNA <-
+  filter(processed_cna_data_discrete, gene == "EGFR")$count
+KRAS_only_AURKA_CNA <-
+  filter(processed_cna_data_discrete, gene == "KRAS")$count
+
+fisher.test(matrix(
+  c(EGFR_only_AURKA_CNA, KRAS_only_AURKA_CNA),
+  byrow = T,
+  nrow = 2
+))
