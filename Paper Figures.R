@@ -529,7 +529,7 @@ processed_cna_data_discrete <- merged_data %>%
           count = count)
 
 processed_cna_data_discrete %>%
-  mutate() %>%
+  mutate(AURKA = fct_relevel(AURKA, "Amplification", "Gain", "Diploid", "Shallow Deletion")) %>%
   ggplot(aes(
     x = gene,
     y = proportion,
@@ -544,7 +544,9 @@ processed_cna_data_discrete %>%
   ylab("Relative Frequency") +
   geom_text(position = position_stack(vjust = 0.5), size = 3.5) +
   coord_flip() +
-  scale_fill_brewer(palette = "Pastel1")
+  scale_fill_brewer(palette = "Pastel1") +
+  theme(legend.position = "top", legend.title = element_blank()) +
+  guides(fill = guide_legend(reverse = TRUE))
 
 ggsave(
   "Paper Figures/Fig XB alternative.png",
