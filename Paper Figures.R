@@ -57,11 +57,9 @@ processed_rna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(
-    method = "wilcox.test",
-    label.y = 4.5,
-    label.x = 1.3
-  )
+  stat_compare_means(method = "wilcox.test",
+                     label.y = 4.5,
+                     label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA.png",
@@ -113,11 +111,9 @@ processed_cna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(
-    method = "wilcox.test",
-    label.y = 4.5,
-    label.x = 1.3
-  )
+  stat_compare_means(method = "wilcox.test",
+                     label.y = 4.5,
+                     label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XB.png",
@@ -163,11 +159,9 @@ processed_rna_data_tp53 <- merged_data %>%
   )
 
 processed_rna_data_tp53 %>%
-  pivot_longer(
-    cols = contains("only"),
-    names_to = "subgroup",
-    values_to = "alteration"
-  ) %>%
+  pivot_longer(cols = contains("only"),
+               names_to = "subgroup",
+               values_to = "alteration") %>%
   filter(!alteration == "WT") %>%
   ggplot(aes(
     y = AURKA_rna_exp,
@@ -183,11 +177,9 @@ processed_rna_data_tp53 %>%
 my_comparisons <- list(c("EGFR_only", "KRAS_only"))
 
 processed_rna_data_tp53 %>%
-  pivot_longer(
-    cols = contains("only"),
-    names_to = "subgroup",
-    values_to = "alteration"
-  ) %>%
+  pivot_longer(cols = contains("only"),
+               names_to = "subgroup",
+               values_to = "alteration") %>%
   filter(!alteration == "WT") %>%
   ggviolin(
     y = "AURKA_rna_exp",
@@ -240,39 +232,23 @@ var(KRAS_only_TP53_mut_AURKA_rna_exp)
 var(KRAS_only_TP53_wt_AURKA_rna_exp)
 # 1.03
 
-ks.test(
-  EGFR_only_TP53_mut_AURKA_rna_exp,
-  EGFR_only_TP53_wt_AURKA_rna_exp
-)
-ks.test(
-  EGFR_only_TP53_wt_AURKA_rna_exp,
-  KRAS_only_TP53_wt_AURKA_rna_exp
-)
-ks.test(
-  KRAS_only_TP53_mut_AURKA_rna_exp,
-  KRAS_only_TP53_wt_AURKA_rna_exp
-)
-ks.test(
-  EGFR_only_TP53_mut_AURKA_rna_exp,
-  KRAS_only_TP53_mut_AURKA_rna_exp
-)
+ks.test(EGFR_only_TP53_mut_AURKA_rna_exp,
+        EGFR_only_TP53_wt_AURKA_rna_exp)
+ks.test(EGFR_only_TP53_wt_AURKA_rna_exp,
+        KRAS_only_TP53_wt_AURKA_rna_exp)
+ks.test(KRAS_only_TP53_mut_AURKA_rna_exp,
+        KRAS_only_TP53_wt_AURKA_rna_exp)
+ks.test(EGFR_only_TP53_mut_AURKA_rna_exp,
+        KRAS_only_TP53_mut_AURKA_rna_exp)
 
-t.test(
-  EGFR_only_TP53_mut_AURKA_rna_exp,
-  EGFR_only_TP53_wt_AURKA_rna_exp
-)
-t.test(
-  EGFR_only_TP53_wt_AURKA_rna_exp,
-  KRAS_only_TP53_wt_AURKA_rna_exp
-)
-t.test(
-  KRAS_only_TP53_mut_AURKA_rna_exp,
-  KRAS_only_TP53_wt_AURKA_rna_exp
-)
-t.test(
-  EGFR_only_TP53_mut_AURKA_rna_exp,
-  KRAS_only_TP53_mut_AURKA_rna_exp
-)
+t.test(EGFR_only_TP53_mut_AURKA_rna_exp,
+       EGFR_only_TP53_wt_AURKA_rna_exp)
+t.test(EGFR_only_TP53_wt_AURKA_rna_exp,
+       KRAS_only_TP53_wt_AURKA_rna_exp)
+t.test(KRAS_only_TP53_mut_AURKA_rna_exp,
+       KRAS_only_TP53_wt_AURKA_rna_exp)
+t.test(EGFR_only_TP53_mut_AURKA_rna_exp,
+       KRAS_only_TP53_mut_AURKA_rna_exp)
 
 
 # Figure XD -----------------------------------------------------------------------
@@ -388,11 +364,9 @@ processed_rna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(
-    method = "wilcox.test",
-    label.y = 4.5,
-    label.x = 1.3
-  )
+  stat_compare_means(method = "wilcox.test",
+                     label.y = 4.5,
+                     label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA EGFR.png",
@@ -443,11 +417,9 @@ processed_protein_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(
-    method = "wilcox.test",
-    label.y = 4.5,
-    label.x = 1.3
-  )
+  stat_compare_means(method = "wilcox.test",
+                     label.y = 4.5,
+                     label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA EGFR protein level.png",
@@ -497,11 +469,9 @@ processed_cna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(
-    method = "wilcox.test",
-    label.y = 4.5,
-    label.x = 1.3
-  )
+  stat_compare_means(method = "wilcox.test",
+                     label.y = 4.5,
+                     label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XB.png",
@@ -554,11 +524,9 @@ processed_cna_data_discrete <- merged_data %>%
   ) %>%
   ungroup() %>%
   group_by(gene) %>%
-  reframe(
-    proportion = count / sum(count),
-    AURKA = AURKA,
-    count = count
-  )
+  reframe(proportion = count / sum(count),
+          AURKA = AURKA,
+          count = count)
 
 processed_cna_data_discrete %>%
   mutate(AURKA = fct_relevel(AURKA, "Amplification", "Gain", "Diploid", "Shallow Deletion")) %>%
@@ -568,11 +536,9 @@ processed_cna_data_discrete %>%
     fill = AURKA,
     label = count
   )) +
-  geom_col(
-    position = "fill",
-    width = .5,
-    colour = "black"
-  ) +
+  geom_col(position = "fill",
+           width = .5,
+           colour = "black") +
   theme_minimal() +
   xlab("Genomic Variation") +
   ylab("Relative Frequency") +
@@ -611,7 +577,7 @@ fisher.test(matrix(
 # Run a proportions test for each pair of proportions
 for (i in 1:4) {
   test_result <-
-    prop.test(c(EGFR_only_AURKA_CNA[i], KRAS_only_AURKA_CNA[i]), 
+    prop.test(c(EGFR_only_AURKA_CNA[i], KRAS_only_AURKA_CNA[i]),
               c(sum(EGFR_only_AURKA_CNA), sum(KRAS_only_AURKA_CNA)))
   print(test_result)
 }
@@ -629,7 +595,7 @@ processed_cna_data_discrete_tp53 <- merged_data %>%
   select(-impact) %>%
   mutate(gene = paste("TP53", TP53, gene, "MUT", sep = "_"),
          gene = as.factor(gene)) %>%
-  select(-TP53) %>% 
+  select(-TP53) %>%
   group_by(AURKA_cna, gene) %>%
   summarise(count = n()) %>%
   mutate(
@@ -643,11 +609,9 @@ processed_cna_data_discrete_tp53 <- merged_data %>%
   ) %>%
   ungroup() %>%
   group_by(gene) %>%
-  reframe(
-    proportion = count / sum(count),
-    AURKA = AURKA,
-    count = count
-  )
+  reframe(proportion = count / sum(count),
+          AURKA = AURKA,
+          count = count)
 
 processed_cna_data_discrete_tp53 %>%
   mutate(AURKA = fct_relevel(AURKA, "Amplification", "Gain", "Diploid", "Shallow Deletion")) %>%
@@ -657,11 +621,9 @@ processed_cna_data_discrete_tp53 %>%
     fill = AURKA,
     label = count
   )) +
-  geom_col(
-    position = "fill",
-    width = .5,
-    colour = "black"
-  ) +
+  geom_col(position = "fill",
+           width = .5,
+           colour = "black") +
   theme_minimal() +
   xlab("Genomic Variation") +
   ylab("Relative Frequency") +
@@ -698,10 +660,10 @@ fisher.test(matrix(
 ))
 
 # Run a proportions test for each pair of proportions
-# test_df <- processed_cna_data_discrete_tp53 %>% 
-#   select(-proportion) %>% 
+# test_df <- processed_cna_data_discrete_tp53 %>%
+#   select(-proportion) %>%
 #   pivot_wider(names_from = gene, values_from = count)
-# 
+#
 # for (i in 1:4) {
 #   for (j in 1:3) {
 #     test_result <- prop.test(c(as.numeric(test_df[i, j + 1]), as.numeric(test_df[i, j + 2])),
@@ -709,7 +671,7 @@ fisher.test(matrix(
 #     if (test_result$p.value < 0.05) {
 #       print(test_df[i, j])
 #       print(test_df[i, j + 1])
-#       print(test_result) 
+#       print(test_result)
 #     }
 #   }
 # }
