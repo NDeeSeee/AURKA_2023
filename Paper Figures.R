@@ -611,7 +611,8 @@ fisher.test(matrix(
 # Run a proportions test for each pair of proportions
 for (i in 1:4) {
   test_result <-
-    prop.test(c(EGFR_only_AURKA_CNA[i], KRAS_only_AURKA_CNA[i]), c(sum(EGFR_only_AURKA_CNA), sum(KRAS_only_AURKA_CNA)))
+    prop.test(c(EGFR_only_AURKA_CNA[i], KRAS_only_AURKA_CNA[i]), 
+              c(sum(EGFR_only_AURKA_CNA), sum(KRAS_only_AURKA_CNA)))
   print(test_result)
 }
 
@@ -697,8 +698,18 @@ fisher.test(matrix(
 ))
 
 # Run a proportions test for each pair of proportions
-for (i in 1:4) {
-  test_result <-
-    prop.test(c(EGFR_only_AURKA_CNA[i], KRAS_only_AURKA_CNA[i]), c(sum(EGFR_only_AURKA_CNA), sum(KRAS_only_AURKA_CNA)))
-  print(test_result)
-}
+# test_df <- processed_cna_data_discrete_tp53 %>% 
+#   select(-proportion) %>% 
+#   pivot_wider(names_from = gene, values_from = count)
+# 
+# for (i in 1:4) {
+#   for (j in 1:3) {
+#     test_result <- prop.test(c(as.numeric(test_df[i, j + 1]), as.numeric(test_df[i, j + 2])),
+#                              c(sum(test_df[, j + 1]), sum(test_df[, j + 2])))
+#     if (test_result$p.value < 0.05) {
+#       print(test_df[i, j])
+#       print(test_df[i, j + 1])
+#       print(test_result) 
+#     }
+#   }
+# }
