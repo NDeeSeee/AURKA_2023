@@ -374,7 +374,7 @@ processed_rna_data_tp53 %>%
     add = "boxplot",
     add.params = list(fill = "white")
   ) +
-  theme(legend.position = "top") +
+  theme(legend.position = "none") +
   # stat_compare_means(
   #   method = "wilcox.test",
   #   label.y = 4.5,
@@ -483,7 +483,7 @@ processed_rna_data_tp53 %>%
     add = "boxplot",
     add.params = list(fill = "white")
   ) +
-  theme(legend.position = "top") +
+  theme(legend.position = "none") +
   # stat_compare_means(method = "wilcox.test",
   #                    label.y = 4.5,
   #                    label.x = 1.3) +
