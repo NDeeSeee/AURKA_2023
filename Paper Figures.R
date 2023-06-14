@@ -707,3 +707,60 @@ for (i in 1:3) {
     )$p.value)
   }
 }
+
+# Figure XF --------------------------------------------------------------------
+processed_rna_data_tp53 <- merged_data %>%
+  filter(EGFR != KRAS) %>%
+  select(EGFR, TP53, KRAS, EGFR_rna_exp) %>%
+  mutate(
+    EGFR_only = ifelse(EGFR == "ALT" & KRAS == "WT", "ALT", "WT"),
+    KRAS_only = ifelse(KRAS == "ALT" & EGFR == "WT", "ALT", "WT"),
+    across(
+      !EGFR_rna_exp,
+      .fns = function(x) {
+        as.factor(x)
+      }
+    )
+  ) %>% 
+  pivot_longer(cols = contains("only"),
+               names_to = "subgroup",
+               values_to = "alteration") %>%
+  filter(!alteration == "WT") 
+
+processed_rna_data_tp53 %>%
+  ggplot(aes(
+    y = EGFR_rna_exp,
+    fill = subgroup,
+    x = subgroup,
+    col = TP53
+  )) +
+  geom_violin(show.legend = F) +
+  geom_boxplot(width = .2, position = position_dodge(.9)) +
+  scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
+  theme_classic()
+
+my_comparisons <- list(c("EGFR_only", "KRAS_only"))
+
+processed_rna_data_tp53 %>%
+  ggviolin(
+    y = "EGFR_rna_exp",
+    fill = "subgroup",
+    x = "subgroup",
+    col = "TP53",
+    add = "boxplot",
+    add.params = list(fill = "white")
+  ) +
+  theme(legend.position = "none") +
+  # stat_compare_means(method = "wilcox.test",
+  #                    label.y = 4.5,
+  #                    label.x = 1.3) +
+  scale_color_manual(values = c("ALT" = "gray80", "WT" = "black"))
+
+
+ggsave(
+  "Paper Figures/Fig XF.png",
+  dpi = 400,
+  height = 5,
+  width = 5,
+  units = "in"
+)
