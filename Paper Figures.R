@@ -727,19 +727,19 @@ processed_rna_data_tp53 <- merged_data %>%
                values_to = "alteration") %>%
   filter(!alteration == "WT")
 
-processed_rna_data_tp53 %>%
-  ggplot(aes(
-    y = EGFR_rna_exp,
-    fill = subgroup,
-    x = subgroup,
-    col = TP53
-  )) +
-  geom_violin(show.legend = F) +
-  geom_boxplot(width = .2, position = position_dodge(.9)) +
-  scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
-  theme_classic()
+# processed_rna_data_tp53 %>%
+#   ggplot(aes(
+#     y = EGFR_rna_exp,
+#     fill = subgroup,
+#     x = subgroup,
+#     col = TP53
+#   )) +
+#   geom_violin(show.legend = F) +
+#   geom_boxplot(width = .2, position = position_dodge(.9)) +
+#   scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
+#   theme_classic()
 
-my_comparisons <- list(c("EGFR_only", "KRAS_only"))
+# my_comparisons <- list(c("EGFR_only", "KRAS_only"))
 
 processed_rna_data_tp53 %>%
   ggviolin(
@@ -750,11 +750,13 @@ processed_rna_data_tp53 %>%
     add = "boxplot",
     add.params = list(fill = "white")
   ) +
-  theme(legend.position = "none") +
+  theme(legend.position = "top") +
   # stat_compare_means(method = "wilcox.test",
   #                    label.y = 4.5,
   #                    label.x = 1.3) +
-  scale_color_manual(values = c("ALT" = "gray80", "WT" = "black"))
+  scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
+  ylab("EGFR mRNA expression, RSEM, Z-scored") +
+  scale_x_discrete(labels = c("EGFR_only" = "EGFR mutated", "KRAS_only" = "KRAS mutated"))
 
 
 ggsave(
