@@ -57,9 +57,12 @@ processed_rna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(method = "wilcox.test",
-                     label.y = 4.5,
-                     label.x = 1.3)
+  ylab("AURKA mRNA expression, RSEM, Z-scored") +
+  xlab("Strata") +
+  scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
+  # stat_compare_means(method = "wilcox.test",
+  #                    label.y = 4.5,
+  #                    label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA.png",
@@ -194,6 +197,7 @@ processed_rna_data_tp53 %>%
   # ) +
   scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
   ylab("AURKA mRNA expression, RSEM, Z-scored") +
+  xlab("Strata") +
   scale_x_discrete(labels = c("EGFR_only" = "EGFR mutated", "KRAS_only" = "KRAS mutated"))
 
 ggsave(
@@ -364,9 +368,12 @@ processed_rna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(method = "wilcox.test",
-                     label.y = 4.5,
-                     label.x = 1.3)
+  ylab("EGFR mRNA expression, RSEM, Z-scored") +
+  xlab("Strata") +
+  scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
+  # stat_compare_means(method = "wilcox.test",
+  #                    label.y = 4.5,
+  #                    label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA EGFR.png",
@@ -417,9 +424,12 @@ processed_protein_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  stat_compare_means(method = "wilcox.test",
-                     label.y = 4.5,
-                     label.x = 1.3)
+  ylab("EGFR protein expression, RPPA, Z-scored") +
+  xlab("Strata") +
+  scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
+  # stat_compare_means(method = "wilcox.test",
+  #                    label.y = 4.5,
+  #                    label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA EGFR protein level.png",
@@ -756,6 +766,7 @@ processed_rna_data_tp53 %>%
   #                    label.x = 1.3) +
   scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
   ylab("EGFR mRNA expression, RSEM, Z-scored") +
+  xlab("Strata") +
   scale_x_discrete(labels = c("EGFR_only" = "EGFR mutated", "KRAS_only" = "KRAS mutated"))
 
 
