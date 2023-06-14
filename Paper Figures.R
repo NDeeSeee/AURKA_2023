@@ -594,9 +594,11 @@ processed_cna_data_discrete_tp53 <- merged_data %>%
   ) %>%
   filter(impact != "WT") %>%
   select(-impact) %>%
-  mutate(gene = paste("TP53", TP53, gene, "MUT", sep = "_"),
-         gene = as.factor(gene),
-         AURKA_cna = as.factor(AURKA_cna)) %>%
+  mutate(
+    gene = paste("TP53", TP53, gene, "MUT", sep = "_"),
+    gene = as.factor(gene),
+    AURKA_cna = as.factor(AURKA_cna)
+  ) %>%
   select(-TP53) %>%
   group_by(AURKA_cna, gene) %>%
   summarise(count = n()) %>%
@@ -681,23 +683,27 @@ fisher.test(matrix(
 
 
 # NEW way
-statistics <- processed_cna_data_discrete_tp53 %>% 
-  mutate(AURKA = str_replace(AURKA, "Amplification", "Gain")) %>% 
-  mutate(AURKA = as.factor(AURKA)) %>% 
-  group_by(gene, AURKA) %>% 
-  reframe(gene = gene, count = sum(count)) %>% 
-  distinct() %>% 
-  group_by(gene) %>% 
-  reframe(sum = sum(count), count = count, AURKA = AURKA) %>% 
-  group_by(AURKA) %>% 
+statistics <- processed_cna_data_discrete_tp53 %>%
+  mutate(AURKA = str_replace(AURKA, "Amplification", "Gain")) %>%
+  mutate(AURKA = as.factor(AURKA)) %>%
+  group_by(gene, AURKA) %>%
+  reframe(gene = gene, count = sum(count)) %>%
+  distinct() %>%
+  group_by(gene) %>%
+  reframe(sum = sum(count),
+          count = count,
+          AURKA = AURKA) %>%
+  group_by(AURKA) %>%
   filter(AURKA == "Gain")
 
-i_ext = c()
+i_ext <- c()
 for (i in 1:3) {
-  i_ext = c(1:4)[which(c(1:4) > i)]
+  i_ext <- c(1:4)[which(c(1:4) > i)]
   for (k in i_ext) {
     print(c(i, k))
-    print(prop.test(c(statistics$count[i], statistics$count[k]),
-                    c(statistics$sum[i], statistics$sum[k]))$p.value)
+    print(prop.test(
+      c(statistics$count[i], statistics$count[k]),
+      c(statistics$sum[i], statistics$sum[k])
+    )$p.value)
   }
 }
