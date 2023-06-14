@@ -60,9 +60,9 @@ processed_rna_data %>%
   ylab("AURKA mRNA expression, RSEM, Z-scored") +
   xlab("Strata") +
   scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
-  # stat_compare_means(method = "wilcox.test",
-  #                    label.y = 4.5,
-  #                    label.x = 1.3)
+# stat_compare_means(method = "wilcox.test",
+#                    label.y = 4.5,
+#                    label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA.png",
@@ -371,9 +371,9 @@ processed_rna_data %>%
   ylab("EGFR mRNA expression, RSEM, Z-scored") +
   xlab("Strata") +
   scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
-  # stat_compare_means(method = "wilcox.test",
-  #                    label.y = 4.5,
-  #                    label.x = 1.3)
+# stat_compare_means(method = "wilcox.test",
+#                    label.y = 4.5,
+#                    label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA EGFR.png",
@@ -427,9 +427,9 @@ processed_protein_data %>%
   ylab("EGFR protein expression, RPPA, Z-scored") +
   xlab("Strata") +
   scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
-  # stat_compare_means(method = "wilcox.test",
-  #                    label.y = 4.5,
-  #                    label.x = 1.3)
+# stat_compare_means(method = "wilcox.test",
+#                    label.y = 4.5,
+#                    label.x = 1.3)
 
 ggsave(
   "Paper Figures/Fig XA EGFR protein level.png",
