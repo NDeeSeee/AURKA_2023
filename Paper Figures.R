@@ -764,3 +764,50 @@ ggsave(
   width = 5,
   units = "in"
 )
+
+
+# Statistics
+EGFR_only_TP53_mut_EGFR_rna_exp <-
+  filter(processed_rna_data_tp53, EGFR == "ALT", TP53 == "ALT")$EGFR_rna_exp
+EGFR_only_TP53_wt_EGFR_rna_exp <-
+  filter(processed_rna_data_tp53, EGFR == "ALT", TP53 == "WT")$EGFR_rna_exp
+
+KRAS_only_TP53_mut_EGFR_rna_exp <-
+  filter(processed_rna_data_tp53, KRAS == "ALT", TP53 == "ALT")$EGFR_rna_exp
+KRAS_only_TP53_wt_EGFR_rna_exp <-
+  filter(processed_rna_data_tp53, KRAS == "ALT", TP53 == "WT")$EGFR_rna_exp
+
+
+# Check for normality
+ad.test(EGFR_only_TP53_mut_EGFR_rna_exp)
+ad.test(EGFR_only_TP53_wt_EGFR_rna_exp)
+ad.test(KRAS_only_TP53_mut_EGFR_rna_exp)
+ad.test(KRAS_only_TP53_wt_EGFR_rna_exp)
+
+# Compute variance for t.test
+var(EGFR_only_TP53_mut_EGFR_rna_exp)
+# 0.88
+var(EGFR_only_TP53_wt_EGFR_rna_exp)
+# 0.71
+var(KRAS_only_TP53_mut_EGFR_rna_exp)
+# 0.73
+var(KRAS_only_TP53_wt_EGFR_rna_exp)
+# 1.03
+
+ks.test(EGFR_only_TP53_mut_EGFR_rna_exp,
+        EGFR_only_TP53_wt_EGFR_rna_exp)
+ks.test(EGFR_only_TP53_wt_EGFR_rna_exp,
+        KRAS_only_TP53_wt_EGFR_rna_exp)
+ks.test(KRAS_only_TP53_mut_EGFR_rna_exp,
+        KRAS_only_TP53_wt_EGFR_rna_exp)
+ks.test(EGFR_only_TP53_mut_EGFR_rna_exp,
+        KRAS_only_TP53_mut_EGFR_rna_exp)
+
+t.test(EGFR_only_TP53_mut_EGFR_rna_exp,
+       EGFR_only_TP53_wt_EGFR_rna_exp)
+t.test(EGFR_only_TP53_wt_EGFR_rna_exp,
+       KRAS_only_TP53_wt_EGFR_rna_exp)
+t.test(KRAS_only_TP53_mut_EGFR_rna_exp,
+       KRAS_only_TP53_wt_EGFR_rna_exp)
+t.test(EGFR_only_TP53_mut_EGFR_rna_exp,
+       KRAS_only_TP53_mut_EGFR_rna_exp)
