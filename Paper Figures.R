@@ -156,13 +156,13 @@ processed_rna_data_tp53 <- merged_data %>%
         as.factor(x)
       }
     )
-  )
+  ) %>% 
+  pivot_longer(cols = contains("only"),
+                     names_to = "subgroup",
+                     values_to = "alteration") %>%
+  filter(!alteration == "WT")
 
 processed_rna_data_tp53 %>%
-  pivot_longer(cols = contains("only"),
-               names_to = "subgroup",
-               values_to = "alteration") %>%
-  filter(!alteration == "WT") %>%
   ggplot(aes(
     y = AURKA_rna_exp,
     fill = subgroup,
@@ -177,10 +177,6 @@ processed_rna_data_tp53 %>%
 my_comparisons <- list(c("EGFR_only", "KRAS_only"))
 
 processed_rna_data_tp53 %>%
-  pivot_longer(cols = contains("only"),
-               names_to = "subgroup",
-               values_to = "alteration") %>%
-  filter(!alteration == "WT") %>%
   ggviolin(
     y = "AURKA_rna_exp",
     x = "subgroup",
@@ -189,12 +185,14 @@ processed_rna_data_tp53 %>%
     add = "boxplot",
     add.params = list(fill = "white")
   ) +
-  stat_compare_means(
-    method = "wilcox.test",
-    label.y = 4.5,
-    label.x = 1.3,
-    paired = T
-  )
+  theme(legend.position = "none") +
+  # stat_compare_means(
+  #   method = "wilcox.test",
+  #   label.y = 4.5,
+  #   label.x = 1.3,
+  #   paired = T
+  # ) +
+  scale_color_manual(values = c("ALT" = "gray80", "WT" = "black"))
 
 ggsave(
   "Paper Figures/Fig XC.png",
