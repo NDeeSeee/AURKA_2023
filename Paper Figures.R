@@ -199,8 +199,8 @@ processed_rna_data_tp53 %>%
 ggsave(
   "Paper Figures/Fig XC.png",
   dpi = 400,
-  height = 5,
-  width = 5,
+  height = 7,
+  width = 7,
   units = "in"
 )
 
@@ -762,8 +762,8 @@ processed_rna_data_tp53 %>%
 ggsave(
   "Paper Figures/Fig XF.png",
   dpi = 400,
-  height = 5,
-  width = 5,
+  height = 7,
+  width = 7,
   units = "in"
 )
 
