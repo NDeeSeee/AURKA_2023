@@ -59,7 +59,7 @@ processed_rna_data %>%
   theme(legend.position = "none") +
   ylab("EGFR mRNA") +
   xlab("") +
-  scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
+  scale_x_discrete(labels = c("EGFR" = "EGFR MUT", "KRAS" = "KRAS MUT"))
 # stat_compare_means(method = "wilcox.test",
 #                    label.y = 4.5,
 #                    label.x = 1.3)
@@ -116,7 +116,7 @@ processed_protein_data %>%
   theme(legend.position = "none") +
   ylab("EGFR protein") +
   xlab("") +
-  scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
+  scale_x_discrete(labels = c("EGFR" = "EGFR MUT", "KRAS" = "KRAS MUT"))
 # stat_compare_means(method = "wilcox.test",
 #                    label.y = 4.5,
 #                    label.x = 1.3)
@@ -171,7 +171,7 @@ processed_rna_data %>%
   theme(legend.position = "none") +
   ylab("AURKA mRNA") +
   xlab("") +
-  scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
+  scale_x_discrete(labels = c("EGFR" = "EGFR MUT", "KRAS" = "KRAS MUT"))
 # stat_compare_means(method = "wilcox.test",
 #                    label.y = 4.5,
 #                    label.x = 1.3)
@@ -384,7 +384,7 @@ processed_rna_data_tp53 %>%
   scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
   ylab("AURKA mRNA") +
   xlab("") +
-  scale_x_discrete(labels = c("EGFR_only" = "EGFR mutated", "KRAS_only" = "KRAS mutated"))
+  scale_x_discrete(labels = c("EGFR_only" = "EGFR MUT", "KRAS_only" = "KRAS MUT"))
 
 ggsave(
   "Paper Figures/Fig 1E.png",
@@ -490,7 +490,7 @@ processed_rna_data_tp53 %>%
   scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
   ylab("EGFR mRNA") +
   xlab("") +
-  scale_x_discrete(labels = c("EGFR_only" = "EGFR mutated", "KRAS_only" = "KRAS mutated"))
+  scale_x_discrete(labels = c("EGFR_only" = "EGFR MUT", "KRAS_only" = "KRAS MUT"))
 
 
 ggsave(
