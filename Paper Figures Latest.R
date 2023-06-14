@@ -122,7 +122,7 @@ processed_protein_data %>%
 #                    label.x = 1.3)
 
 ggsave(
-  "Paper Figures/Fig XA EGFR protein level.png",
+  "Paper Figures/Fig 1B.png",
   dpi = 400,
   height = 5,
   width = 5,
@@ -147,59 +147,6 @@ var(KRAS_only_EGFR_protein_exp, na.rm = T)
 
 ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
 t.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
-
-processed_cna_data <- merged_data %>%
-  filter(EGFR != KRAS, !is.na(AURKA_CNA_log2)) %>%
-  select(AURKA_CNA_log2, EGFR, KRAS) %>%
-  pivot_longer(
-    cols = c("EGFR", "KRAS"),
-    names_to = "gene",
-    values_to = "impact"
-  ) %>%
-  filter(impact != "WT") %>%
-  select(-impact) %>%
-  mutate(gene = as.factor(gene))
-
-processed_cna_data %>%
-  ggviolin(
-    y = "AURKA_CNA_log2",
-    x = "gene",
-    fill = "gene",
-    add = "boxplot",
-    add.params = list(fill = "white")
-  ) +
-  theme(legend.position = "none") +
-  stat_compare_means(method = "wilcox.test",
-                     label.y = 4.5,
-                     label.x = 1.3)
-
-ggsave(
-  "Paper Figures/Fig 1B.png",
-  dpi = 400,
-  height = 5,
-  width = 5,
-  units = "in"
-)
-
-# Statistics
-EGFR_only_AURKA_CNA_log2 <-
-  filter(processed_cna_data, gene == "EGFR")$AURKA_CNA_log2
-KRAS_only_AURKA_CNA_log2 <-
-  filter(processed_cna_data, gene == "KRAS")$AURKA_CNA_log2
-
-# Check for normality
-ad.test(EGFR_only_AURKA_CNA_log2)
-ad.test(KRAS_only_AURKA_CNA_log2)
-
-# Compute variance for t.test
-var(EGFR_only_AURKA_CNA_log2)
-# 0.276
-var(KRAS_only_AURKA_CNA_log2)
-# 0.164
-
-ks.test(EGFR_only_AURKA_CNA_log2, KRAS_only_AURKA_CNA_log2)
-t.test(EGFR_only_AURKA_CNA_log2, KRAS_only_AURKA_CNA_log2)
-
 # Figure C --------------------------------------------------------------------
 processed_rna_data <- merged_data %>%
   filter(EGFR != KRAS) %>%
@@ -313,7 +260,9 @@ processed_cna_data_discrete_tp53 %>%
     legend.title = element_blank(),
     axis.text = element_text(size = 15, colour = "black"),
     axis.title = element_text(size = 15, colour = "black"),
-    legend.text = element_text(size = 15, colour = "black")
+    legend.text = element_text(size = 15, colour = "black"),
+    panel.grid.major = element_line(colour = "gray40"),
+    panel.grid.minor = element_line(colour = "gray40")
   ) +
   guides(fill = guide_legend(reverse = TRUE))
 
