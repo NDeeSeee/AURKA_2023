@@ -57,8 +57,8 @@ processed_rna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  ylab("AURKA mRNA expression, RSEM, Z-scored") +
-  xlab("Strata") +
+  ylab("AURKA mRNA") +
+  xlab("") +
   scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
 # stat_compare_means(method = "wilcox.test",
 #                    label.y = 4.5,
@@ -196,15 +196,15 @@ processed_rna_data_tp53 %>%
   #   paired = T
   # ) +
   scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
-  ylab("AURKA mRNA expression, RSEM, Z-scored") +
-  xlab("Strata") +
+  ylab("AURKA mRNA") +
+  xlab("") +
   scale_x_discrete(labels = c("EGFR_only" = "EGFR mutated", "KRAS_only" = "KRAS mutated"))
 
 ggsave(
   "Paper Figures/Fig XC.png",
   dpi = 400,
-  height = 7,
-  width = 7,
+  height = 5,
+  width = 5,
   units = "in"
 )
 
@@ -368,8 +368,8 @@ processed_rna_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  ylab("EGFR mRNA expression, RSEM, Z-scored") +
-  xlab("Strata") +
+  ylab("EGFR mRNA") +
+  xlab("") +
   scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
 # stat_compare_means(method = "wilcox.test",
 #                    label.y = 4.5,
@@ -424,8 +424,8 @@ processed_protein_data %>%
     add.params = list(fill = "white")
   ) +
   theme(legend.position = "none") +
-  ylab("EGFR protein expression, RPPA, Z-scored") +
-  xlab("Strata") +
+  ylab("EGFR protein") +
+  xlab("") +
   scale_x_discrete(labels = c("EGFR" = "EGFR mutated", "KRAS" = "KRAS mutated"))
 # stat_compare_means(method = "wilcox.test",
 #                    label.y = 4.5,
@@ -765,16 +765,16 @@ processed_rna_data_tp53 %>%
   #                    label.y = 4.5,
   #                    label.x = 1.3) +
   scale_color_manual(values = c("ALT" = "gray80", "WT" = "black")) +
-  ylab("EGFR mRNA expression, RSEM, Z-scored") +
-  xlab("Strata") +
+  ylab("EGFR mRNA") +
+  xlab("") +
   scale_x_discrete(labels = c("EGFR_only" = "EGFR mutated", "KRAS_only" = "KRAS mutated"))
 
 
 ggsave(
   "Paper Figures/Fig XF.png",
   dpi = 400,
-  height = 7,
-  width = 7,
+  height = 5,
+  width = 5,
   units = "in"
 )
 
