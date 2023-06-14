@@ -88,6 +88,12 @@ var(EGFR_only_EGFR_rna_exp)
 var(KRAS_only_EGFR_rna_exp)
 # 1
 
+# Compute median
+median(EGFR_only_EGFR_rna_exp)
+# 0.53
+median(KRAS_only_EGFR_rna_exp)
+# -0.14
+
 ks.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 t.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 
@@ -144,6 +150,12 @@ var(EGFR_only_EGFR_protein_exp, na.rm = T)
 # 0.9
 var(KRAS_only_EGFR_protein_exp, na.rm = T)
 # 1
+
+# Compute median
+median(EGFR_only_EGFR_protein_exp, na.rm = T)
+# 0.4
+median(KRAS_only_EGFR_protein_exp, na.rm = T)
+# -0.29
 
 ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
 t.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
