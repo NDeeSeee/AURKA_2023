@@ -100,7 +100,7 @@ t.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 
 # Figure B -------------------------------------------------
 processed_protein_data <- merged_data %>%
-  filter(EGFR != KRAS) %>%
+  filter(EGFR != KRAS, study_id != "luad_cptac_2020") %>%
   select(EGFR_protein_exp, EGFR, KRAS) %>%
   pivot_longer(
     cols = c("EGFR", "KRAS"),
@@ -211,6 +211,13 @@ var(EGFR_only_AURKA_rna_exp)
 # 0.9
 var(KRAS_only_AURKA_rna_exp)
 # 1
+
+# Medians
+median(EGFR_only_AURKA_rna_exp)
+# -0.16
+median(KRAS_only_AURKA_rna_exp)
+# 0.18
+
 
 ks.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
 t.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
