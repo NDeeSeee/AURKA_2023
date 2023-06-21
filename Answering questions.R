@@ -60,14 +60,9 @@ merged_data %>%
   )
 
 # 2 Question ------------
-df_test <- tibble(
-  a = rnorm(100, mean = 10, sd = 2),
-  b = rnorm(100, mean = 11, sd = 1.5)
-) %>% 
-  pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
-  mutate(variable = as.factor(variable))
-
-plot_violin_chart <- function(df, ylab = "Density") {
+plot_violin_chart <- function(df, 
+                              ylab = "Density",
+                              stat_test = "wilcox.test") {
   p <- df %>% 
     ggviolin(
       y = "value",
@@ -80,24 +75,66 @@ plot_violin_chart <- function(df, ylab = "Density") {
     stat_compare_means(
       aes(group = variable),
       comparisons = list(c("a", "b")),
-      method = "t.test"
+      method = {stat_test}
     ) +
     theme_bw() +
     theme(legend.position = "none") +
     labs(
       x = "Value",
       y = {ylab},
-      title = "Violin plots with mean comparison"
+      title = {stat_test}
     )
   return(p)
-  }
+}
 
-plot_violin_chart(df_test)
+generate_random_data <- function(n = 100,
+                                 mean_1 = 10,
+                                 mean_2 = 11,
+                                 sd_1 = 2,
+                                 sd_2 = 2,
+                                 z_trans = F) {
+  df <- tibble(
+    a = rnorm(n = {n}, mean = {mean_1}, sd = {sd_1}),
+    b = rnorm(n = {n}, mean = {mean_2}, sd = {sd_2})
+  ) %>% 
+    pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
+    mutate(variable = as.factor(variable))
 
-df_test %>% 
-  mutate(value = log(value, base = 2),
-         value = scale(value)) %>% 
-  plot_violin_chart(ylab = "Density, log2, Z-scored")
+  return(df)
+}
+
+compare_chart <- function(n = 100,
+                          mean_1 = 10,
+                          mean_2 = 11,
+                          sd_1 = 2,
+                          sd_2 = 2,
+                          stat_test = "wilcox.test") {
+  
+  df_plain = generate_random_data(n = n,
+                                  mean_1 = mean_1,
+                                  mean_2 = mean_2,
+                                  sd_1 = sd_1,
+                                  sd_2 = sd_2)
+  
+  df_z_trans = df_plain %>% 
+    mutate(value = log(value, base = 2),
+           value = scale(value))
+  
+  chart_plain = plot_violin_chart(df_plain,
+                                  ylab = "Density",
+                                  stat_test = {stat_test})
+  
+  chart_z_trans = plot_violin_chart(df_z_trans,
+                                  ylab = "Density, log2, Z-scored",
+                                  stat_test = {stat_test})
+  
+  combined_chart = ggarrange(chart_plain, chart_z_trans)
+  
+  return(combined_chart)
+}
+
+compare_chart(stat_test = "t.test")
+compare_chart(stat_test = "wilcox.test")
 
 # 3 Question ------------
 # 4 Question ------------
