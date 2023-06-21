@@ -54,16 +54,14 @@ merged_data %>%
   filter(!is.na(AURKA_cna), !is.na(AURKA_CNA_log2)) %>%
   mutate(AURKA_cna = as.factor(AURKA_cna)) %>%
   group_by(AURKA_cna) %>%
-  reframe(
-    min = min(AURKA_CNA_log2),
-    max = max(AURKA_CNA_log2)
-  )
+  reframe(min = min(AURKA_CNA_log2),
+          max = max(AURKA_CNA_log2))
 
 # 2 Question ------------
-plot_violin_chart <- function(df, 
+plot_violin_chart <- function(df,
                               ylab = "Density",
                               stat_test = "wilcox.test") {
-  p <- df %>% 
+  p <- df %>%
     ggviolin(
       y = "value",
       x = "variable",
@@ -72,18 +70,20 @@ plot_violin_chart <- function(df,
       add.params = list(fill = "white"),
       palette = c("#00AFBB", "#E7B800")
     ) +
-    stat_compare_means(
-      aes(group = variable),
-      comparisons = list(c("a", "b")),
-      method = {stat_test}
-    ) +
+    stat_compare_means(aes(group = variable),
+                       comparisons = list(c("a", "b")),
+                       method = {
+                         stat_test
+                       }) +
     theme_bw() +
     theme(legend.position = "none") +
-    labs(
-      x = "Value",
-      y = {ylab},
-      title = {stat_test}
-    )
+    labs(x = "Value",
+         y = {
+           ylab
+         },
+         title = {
+           stat_test
+         })
   return(p)
 }
 
@@ -93,13 +93,23 @@ generate_random_data <- function(n = 100,
                                  sd_1 = 2,
                                  sd_2 = 2,
                                  z_trans = F) {
-  df <- tibble(
-    a = rnorm(n = {n}, mean = {mean_1}, sd = {sd_1}),
-    b = rnorm(n = {n}, mean = {mean_2}, sd = {sd_2})
-  ) %>% 
-    pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
+  df <- tibble(a = rnorm(n = {
+    n
+  }, mean = {
+    mean_1
+  }, sd = {
+    sd_1
+  }),
+  b = rnorm(n = {
+    n
+  }, mean = {
+    mean_2
+  }, sd = {
+    sd_2
+  })) %>%
+    pivot_longer(everything(), names_to = "variable", values_to = "value") %>%
     mutate(variable = as.factor(variable))
-
+  
   return(df)
 }
 
@@ -109,26 +119,31 @@ compare_chart <- function(n = 100,
                           sd_1 = 2,
                           sd_2 = 2,
                           stat_test = "wilcox.test") {
+  df_plain <- generate_random_data(
+    n = n,
+    mean_1 = mean_1,
+    mean_2 = mean_2,
+    sd_1 = sd_1,
+    sd_2 = sd_2
+  )
   
-  df_plain = generate_random_data(n = n,
-                                  mean_1 = mean_1,
-                                  mean_2 = mean_2,
-                                  sd_1 = sd_1,
-                                  sd_2 = sd_2)
-  
-  df_z_trans = df_plain %>% 
+  df_z_trans <- df_plain %>%
     mutate(value = log(value, base = 2),
            value = scale(value))
   
-  chart_plain = plot_violin_chart(df_plain,
-                                  ylab = "Density",
-                                  stat_test = {stat_test})
+  chart_plain <- plot_violin_chart(df_plain,
+                                   ylab = "Density",
+                                   stat_test = {
+                                     stat_test
+                                   })
   
-  chart_z_trans = plot_violin_chart(df_z_trans,
-                                  ylab = "Density, log2, Z-scored",
-                                  stat_test = {stat_test})
+  chart_z_trans <- plot_violin_chart(df_z_trans,
+                                     ylab = "Density, log2, Z-scored",
+                                     stat_test = {
+                                       stat_test
+                                     })
   
-  combined_chart = ggarrange(chart_plain, chart_z_trans)
+  combined_chart <- ggarrange(chart_plain, chart_z_trans)
   
   return(combined_chart)
 }
@@ -151,20 +166,24 @@ processed_rna_data_tp53 <- merged_data %>%
       }
     )
   ) %>%
-  pivot_longer(
-    cols = contains("only"),
-    names_to = "subgroup",
-    values_to = "alteration"
-  ) %>%
+  pivot_longer(cols = contains("only"),
+               names_to = "subgroup",
+               values_to = "alteration") %>%
   filter(!alteration == "WT",
-         !is.na(AURKA_CNA_log2)) %>% 
-  mutate(TP53 = paste("TP53", TP53, sep = "_"),
-         subgroup = paste(subgroup, TP53, sep = "_")) %>% 
-  select(-EGFR, -KRAS, -alteration, -TP53) %>% 
-  mutate(subgroup = case_when(subgroup == "KRAS_only_TP53_WT" ~ "K",
-                              subgroup == "KRAS_only_TP53_ALT" ~ "KT",
-                              subgroup == "EGFR_only_TP53_WT" ~ "E",
-                              subgroup == "EGFR_only_TP53_ALT" ~ "ET")) %>% 
+         !is.na(AURKA_CNA_log2)) %>%
+  mutate(
+    TP53 = paste("TP53", TP53, sep = "_"),
+    subgroup = paste(subgroup, TP53, sep = "_")
+  ) %>%
+  select(-EGFR, -KRAS, -alteration, -TP53) %>%
+  mutate(
+    subgroup = case_when(
+      subgroup == "KRAS_only_TP53_WT" ~ "K",
+      subgroup == "KRAS_only_TP53_ALT" ~ "KT",
+      subgroup == "EGFR_only_TP53_WT" ~ "E",
+      subgroup == "EGFR_only_TP53_ALT" ~ "ET"
+    )
+  ) %>%
   mutate(subgroup = as.factor(subgroup))
 
 processed_rna_data_tp53 %>%
