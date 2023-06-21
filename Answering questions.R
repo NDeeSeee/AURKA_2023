@@ -1,3 +1,40 @@
+# Attach requirement packages and setting WD -----------------------------------
+packages_names <-
+  c(
+    "tidyverse",
+    "data.table",
+    "readxl",
+    "reshape2",
+    "rstudioapi",
+    "caTools",
+    "car",
+    "quantmod",
+    "MASS",
+    "corrplot",
+    "janitor",
+    "nortest",
+    "survminer",
+    "survival",
+    "broom",
+    "forestplot"
+  )
+
+lapply(packages_names, require, character.only = TRUE)
+
+setwd(dirname(getActiveDocumentContext()$path))
+
+rename <- dplyr::rename
+select <- dplyr::select
+filter <- dplyr::filter
+group_by <- dplyr::group_by
+mutate <- dplyr::mutate
+
+
+# Reading data
+merged_data <-
+  fread("Merged annotated data AURKA, KRAS, TP53, EGFR.csv") %>%
+  as_tibble()
+
 # 1 Question -------------------------------------------------------------------
 merged_data %>%
   filter(!is.na(AURKA_cna)) %>%
