@@ -151,11 +151,11 @@ var(EGFR_only_EGFR_protein_exp, na.rm = T)
 var(KRAS_only_EGFR_protein_exp, na.rm = T)
 # 1
 
-# Compute median
+# Compute medians
 median(EGFR_only_EGFR_protein_exp, na.rm = T)
-# 0.4
+# 0.48
 median(KRAS_only_EGFR_protein_exp, na.rm = T)
-# -0.29
+# -0.3
 
 ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
 t.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
