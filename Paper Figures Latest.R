@@ -84,9 +84,9 @@ ad.test(KRAS_only_EGFR_rna_exp)
 
 # Compute variance for t.test
 var(EGFR_only_EGFR_rna_exp)
-# 0.9
-var(KRAS_only_EGFR_rna_exp)
 # 1
+var(KRAS_only_EGFR_rna_exp)
+# 0.64
 
 # Compute median
 median(EGFR_only_EGFR_rna_exp)
@@ -96,6 +96,7 @@ median(KRAS_only_EGFR_rna_exp)
 
 ks.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 t.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
+wilcox.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 
 
 # Figure B -------------------------------------------------
@@ -143,13 +144,15 @@ KRAS_only_EGFR_protein_exp <-
 
 # Check for normality
 ad.test(EGFR_only_EGFR_protein_exp)
+# 9.424e-05
 ad.test(KRAS_only_EGFR_protein_exp)
+# 0.0008593
 
 # Compute variance for t.test
 var(EGFR_only_EGFR_protein_exp, na.rm = T)
-# 0.9
+# 2.35
 var(KRAS_only_EGFR_protein_exp, na.rm = T)
-# 1
+# 0.57
 
 # Compute medians
 median(EGFR_only_EGFR_protein_exp, na.rm = T)
@@ -159,6 +162,8 @@ median(KRAS_only_EGFR_protein_exp, na.rm = T)
 
 ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
 t.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
+wilcox.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
+
 # Figure C --------------------------------------------------------------------
 processed_rna_data <- merged_data %>%
   filter(EGFR != KRAS) %>%
@@ -204,7 +209,9 @@ KRAS_only_AURKA_rna_exp <-
 
 # Check for normality
 ad.test(EGFR_only_AURKA_rna_exp)
+# 0.1635
 ad.test(KRAS_only_AURKA_rna_exp)
+# 0.03213
 
 # Compute variance for t.test
 var(EGFR_only_AURKA_rna_exp)
@@ -221,7 +228,7 @@ median(KRAS_only_AURKA_rna_exp)
 
 ks.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
 t.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
-
+wilcox.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
 
 # Figure D ---------------------------------------------------
 processed_cna_data_discrete_tp53 <- merged_data %>%
@@ -450,13 +457,13 @@ ks.test(KRAS_only_TP53_mut_AURKA_rna_exp,
 ks.test(EGFR_only_TP53_mut_AURKA_rna_exp,
         KRAS_only_TP53_mut_AURKA_rna_exp)
 
-t.test(EGFR_only_TP53_mut_AURKA_rna_exp,
+wilcox.test(EGFR_only_TP53_mut_AURKA_rna_exp,
        EGFR_only_TP53_wt_AURKA_rna_exp)
-t.test(EGFR_only_TP53_wt_AURKA_rna_exp,
+wilcox.test(EGFR_only_TP53_wt_AURKA_rna_exp,
        KRAS_only_TP53_wt_AURKA_rna_exp)
-t.test(KRAS_only_TP53_mut_AURKA_rna_exp,
+wilcox.test(KRAS_only_TP53_mut_AURKA_rna_exp,
        KRAS_only_TP53_wt_AURKA_rna_exp)
-t.test(EGFR_only_TP53_mut_AURKA_rna_exp,
+wilcox.test(EGFR_only_TP53_mut_AURKA_rna_exp,
        KRAS_only_TP53_mut_AURKA_rna_exp)
 
 
@@ -541,13 +548,23 @@ ad.test(KRAS_only_TP53_wt_EGFR_rna_exp)
 
 # Compute variance for t.test
 var(EGFR_only_TP53_mut_EGFR_rna_exp)
-# 0.88
+# 1.4
 var(EGFR_only_TP53_wt_EGFR_rna_exp)
-# 0.71
+# 0.67
 var(KRAS_only_TP53_mut_EGFR_rna_exp)
-# 0.73
+# 0.79
 var(KRAS_only_TP53_wt_EGFR_rna_exp)
-# 1.03
+# 0.51
+
+
+median(EGFR_only_TP53_mut_EGFR_rna_exp)
+# 0.72
+median(EGFR_only_TP53_wt_EGFR_rna_exp)
+# 0.37
+median(KRAS_only_TP53_mut_EGFR_rna_exp)
+# 0.05
+median(KRAS_only_TP53_wt_EGFR_rna_exp)
+# -0.31
 
 ks.test(EGFR_only_TP53_mut_EGFR_rna_exp,
         EGFR_only_TP53_wt_EGFR_rna_exp)
@@ -558,11 +575,11 @@ ks.test(KRAS_only_TP53_mut_EGFR_rna_exp,
 ks.test(EGFR_only_TP53_mut_EGFR_rna_exp,
         KRAS_only_TP53_mut_EGFR_rna_exp)
 
-t.test(EGFR_only_TP53_mut_EGFR_rna_exp,
+wilcox.test(EGFR_only_TP53_mut_EGFR_rna_exp,
        EGFR_only_TP53_wt_EGFR_rna_exp)
-t.test(EGFR_only_TP53_wt_EGFR_rna_exp,
+wilcox.test(EGFR_only_TP53_wt_EGFR_rna_exp,
        KRAS_only_TP53_wt_EGFR_rna_exp)
-t.test(KRAS_only_TP53_mut_EGFR_rna_exp,
+wilcox.test(KRAS_only_TP53_mut_EGFR_rna_exp,
        KRAS_only_TP53_wt_EGFR_rna_exp)
-t.test(EGFR_only_TP53_mut_EGFR_rna_exp,
+wilcox.test(EGFR_only_TP53_mut_EGFR_rna_exp,
        KRAS_only_TP53_mut_EGFR_rna_exp)
