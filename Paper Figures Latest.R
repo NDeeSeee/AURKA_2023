@@ -94,6 +94,12 @@ median(EGFR_only_EGFR_rna_exp)
 median(KRAS_only_EGFR_rna_exp)
 # -0.14
 
+# Compute means and n
+mean(EGFR_only_EGFR_rna_exp)
+length(EGFR_only_EGFR_rna_exp)
+mean(KRAS_only_EGFR_rna_exp)
+length(KRAS_only_EGFR_rna_exp)
+
 ks.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 t.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
 wilcox.test(EGFR_only_EGFR_rna_exp, KRAS_only_EGFR_rna_exp)
@@ -160,6 +166,11 @@ median(EGFR_only_EGFR_protein_exp, na.rm = T)
 median(KRAS_only_EGFR_protein_exp, na.rm = T)
 # -0.3
 
+mean(EGFR_only_EGFR_protein_exp, na.rm = T)
+length(EGFR_only_EGFR_protein_exp)
+mean(KRAS_only_EGFR_protein_exp, na.rm = T)
+length(KRAS_only_EGFR_protein_exp)
+
 ks.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
 t.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
 wilcox.test(EGFR_only_EGFR_protein_exp, KRAS_only_EGFR_protein_exp)
@@ -225,6 +236,10 @@ median(EGFR_only_AURKA_rna_exp)
 median(KRAS_only_AURKA_rna_exp)
 # 0.18
 
+mean(EGFR_only_AURKA_rna_exp, na.rm = T)
+length(EGFR_only_AURKA_rna_exp)
+mean(KRAS_only_AURKA_rna_exp, na.rm = T)
+length(KRAS_only_AURKA_rna_exp)
 
 ks.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
 t.test(EGFR_only_AURKA_rna_exp, KRAS_only_AURKA_rna_exp)
@@ -466,6 +481,15 @@ wilcox.test(KRAS_only_TP53_mut_AURKA_rna_exp,
 wilcox.test(EGFR_only_TP53_mut_AURKA_rna_exp,
        KRAS_only_TP53_mut_AURKA_rna_exp)
 
+mean(EGFR_only_TP53_mut_AURKA_rna_exp, na.rm = T)
+length(EGFR_only_TP53_mut_AURKA_rna_exp)
+mean(EGFR_only_TP53_wt_AURKA_rna_exp, na.rm = T)
+length(EGFR_only_TP53_wt_AURKA_rna_exp)
+mean(KRAS_only_TP53_mut_AURKA_rna_exp, na.rm = T)
+length(KRAS_only_TP53_mut_AURKA_rna_exp)
+mean(KRAS_only_TP53_wt_AURKA_rna_exp, na.rm = T)
+length(KRAS_only_TP53_wt_AURKA_rna_exp)
+
 
 # Figure F --------------------------------------------------------------------
 processed_rna_data_tp53 <- merged_data %>%
@@ -583,3 +607,12 @@ wilcox.test(KRAS_only_TP53_mut_EGFR_rna_exp,
        KRAS_only_TP53_wt_EGFR_rna_exp)
 wilcox.test(EGFR_only_TP53_mut_EGFR_rna_exp,
        KRAS_only_TP53_mut_EGFR_rna_exp)
+
+mean(EGFR_only_TP53_mut_EGFR_rna_exp, na.rm = T)
+length(EGFR_only_TP53_mut_EGFR_rna_exp)
+mean(EGFR_only_TP53_wt_EGFR_rna_exp, na.rm = T)
+length(EGFR_only_TP53_wt_EGFR_rna_exp)
+mean(KRAS_only_TP53_mut_EGFR_rna_exp, na.rm = T)
+length(KRAS_only_TP53_mut_EGFR_rna_exp)
+mean(KRAS_only_TP53_wt_EGFR_rna_exp, na.rm = T)
+length(KRAS_only_TP53_wt_EGFR_rna_exp)
