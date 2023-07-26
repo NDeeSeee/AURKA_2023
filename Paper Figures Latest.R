@@ -326,37 +326,6 @@ ggsave(
 )
 
 # Statistics
-EGFR_only_AURKA_CNA <-
-  filter(processed_cna_data_discrete_tp53, gene == "EGFR")$count
-KRAS_only_AURKA_CNA <-
-  filter(processed_cna_data_discrete_tp53, gene == "KRAS")$count
-
-fisher.test(matrix(
-  c(EGFR_only_AURKA_CNA, KRAS_only_AURKA_CNA),
-  byrow = T,
-  nrow = 2
-))
-
-# Run a proportions test for each pair of proportions
-# test_df <- processed_cna_data_discrete_tp53 %>%
-#   select(-proportion) %>%
-#   pivot_wider(names_from = gene, values_from = count)
-#
-# for (i in 1:4) {
-#   for (j in 1:3) {
-#     test_result <- prop.test(c(as.numeric(test_df[i, j + 1]), as.numeric(test_df[i, j + 2])),
-#                              c(sum(test_df[, j + 1]), sum(test_df[, j + 2])))
-#     if (test_result$p.value < 0.05) {
-#       print(test_df[i, j])
-#       print(test_df[i, j + 1])
-#       print(test_result)
-#     }
-#   }
-# }
-
-
-
-# NEW way
 statistics <- processed_cna_data_discrete_tp53 %>%
   mutate(AURKA = str_replace(AURKA, "Amplification", "Gain")) %>%
   mutate(AURKA = as.factor(AURKA)) %>%
